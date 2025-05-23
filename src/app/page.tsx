@@ -46,7 +46,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-left">
             {[
               { title: "Software Development", desc: "Custom apps, SaaS, and web platforms built with precision and performance." },
-              { title: "Game Design (Win It Studios)", desc: "Mobile, desktop, and console gaming experiences that entertain and inspire." },
+              { title: "Game Design", desc: "Mobile, desktop, and console gaming experiences that entertain and inspire." },
               { title: "Tourism-Tech", desc: "Smart travel solutions promoting culture and accessibility." },
               { title: "Digital Services", desc: "Branding, consulting, content, and digital transformation for modern businesses." },
               { title: "Merch & Apparel", desc: "Design-first printed T-shirts, lifestyle wear, and custom dropshipping." },
