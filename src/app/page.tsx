@@ -3,6 +3,7 @@
 // It includes a header, a section describing the services offered, and a footer with contact information.
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
@@ -13,6 +14,23 @@ export default function HomePage() {
         transition={{ duration: 0.8 }}
         className="container mx-auto px-6 py-16 text-center"
       >
+        {/* Logo at the top */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7 }}
+          className="flex justify-center mb-6"
+        >
+          <Image
+            src="/logo.png"
+            alt="Rawat Innovations Logo"
+            width={120}
+            height={120}
+            priority
+            className="mx-auto"
+          />
+        </motion.div>
+        {/* Main heading and description */}
         <motion.h1
           className="text-5xl font-bold text-blue-900 mb-4"
           initial={{ opacity: 0 }}
