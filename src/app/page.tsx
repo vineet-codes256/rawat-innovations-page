@@ -40,12 +40,20 @@ export default function HomePage() {
           Rawat Innovations Pvt. Ltd.
         </motion.h1>
         <motion.p
-          className="text-lg max-w-2xl mx-auto mb-8"
+          className="text-lg max-w-2xl mx-auto mb-1"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Empowering the future through technology, creativity, and purpose. We innovate across software, gaming, tourism, agritech, apparel, and digital services.
+          Empowering the future through technology, creativity, and purpose.
+        </motion.p>
+        <motion.p
+          className="text-sm text-gray-700 mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          We innovate across software, gaming, tourism, agritech, apparel, and digital services.
         </motion.p>
         <motion.a
           href="#contact"
