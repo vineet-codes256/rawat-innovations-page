@@ -56,7 +56,7 @@ export default function HomePage() {
           We innovate across software, gaming, tourism, agritech, apparel, and digital services.
         </motion.p>
         <motion.a
-          href="#contact"
+          href="mailto:info@rawatinnovations.com"
           className="inline-block bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-full transition"
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
