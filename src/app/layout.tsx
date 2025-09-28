@@ -135,6 +135,27 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Rawat Innovations",
+              "url": "https://rawatinnovations.com",
+              "description": "Multi-sector technology company specializing in software development, gaming, tourism tech, agritech, and digital services",
+              "publisher": {
+                "@type": "Organization",
+                "name": "Rawat Innovations Pvt. Ltd."
+              },
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://rawatinnovations.com/#contact",
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Rawat Innovations Pvt. Ltd.",
               "url": "https://rawatinnovations.com",

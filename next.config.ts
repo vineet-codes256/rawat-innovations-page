@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
   experimental: {
     scrollRestoration: true,
   },
+  // Output optimization
+  output: 'standalone',
   // Security headers
   async headers() {
     return [
@@ -32,6 +34,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
           },
         ],
       },
