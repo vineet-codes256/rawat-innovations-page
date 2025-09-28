@@ -539,16 +539,16 @@ export default function HomePage() {
                   category: "Tourism",
                   description: "AI-driven travel companion with cultural insights and accessibility features.",
                   status: "Design",
-                  imageSrc: "/project-tourism.png",
+                  imageSrc: "/portfolio-tourism-app.png",
                   imageAlt: "Smart Tourism App",
                   timeline: "Q3 2026"
                 },
                 {
                   title: "Sustainable Fashion Platform",
                   category: "Merch",
-                  description: "Eco-friendly apparel marketplace with NFT integration.",
+                  description: "Eco-friendly apparel marketplace. Custom designs and sustainable materials.",
                   status: "Concept",
-                  imageSrc: "/project-fashion.png",
+                  imageSrc: "/portfolio-fashion-platform.png",
                   imageAlt: "Sustainable Fashion",
                   timeline: "2027"
                 },
@@ -557,7 +557,7 @@ export default function HomePage() {
                   category: "AgriTech",
                   description: "Connected farming solutions for precision agriculture.",
                   status: "Research",
-                  imageSrc: "/project-agritech.png",
+                  imageSrc: "/portfolio-agriculture-network.png",
                   imageAlt: "IoT Agriculture",
                   timeline: "2027"
                 }
@@ -577,7 +577,7 @@ export default function HomePage() {
                       alt={project.imageAlt}
                       width={120}
                       height={120}
-                      className="w-24 h-24 object-contain"
+                      className="w-48 h-48 object-contain"
                       loading="lazy"
                     />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-blue-600">
@@ -639,11 +639,11 @@ export default function HomePage() {
               >
                 <div className="h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
                   <Image
-                    src="/blog-featured.png"
-                    alt="Innovation and Technology"
-                    width={200}
-                    height={200}
-                    className="w-32 h-32 object-contain"
+                  src="/blog-featured.png"
+                  alt="Innovation and Technology"
+                  width={700}
+                  height={200}
+                  className="w-100 h-21 object-cover max-h-64"
                   />
                 </div>
                 <div className="p-8">
@@ -657,8 +657,8 @@ export default function HomePage() {
                     The Future of Multi-Sector Innovation: Building Moonshot Products
                   </h3>
                   <p className="text-gray-700 leading-relaxed mb-4">
-                    Explore how Rawat Innovations is pioneering innovation across six diverse sectors,
-                    from AI-powered agriculture to immersive gaming experiences...
+                    Explore how Rawat Innovations is aiming to pioneer innovation across six diverse sectors,
+                    from moonshot social apps, sustainable fashion platforms, and AI-powered sustainable agriculture to immersive gaming experiences...
                   </p>
                   <div className="flex items-center">
                     <Image
@@ -864,16 +864,16 @@ export default function HomePage() {
                           href={social.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white hover:shadow-lg transition-shadow"
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:shadow-lg transition-shadow backdrop-blur-sm bg-white/20"
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                         >
                           <Image
                             src={social.icon}
                             alt="Social Media"
-                            width={20}
-                            height={20}
-                            className="w-5 h-5 object-contain"
+                            width={40}
+                            height={40}
+                            className="w-10 h-10 rounded-lg object-contain"
                           />
                         </motion.a>
                       ))}
@@ -901,7 +901,7 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Contact Form */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
@@ -987,7 +987,7 @@ export default function HomePage() {
                 </form>
               </motion.div>
 
-              {/* Contact Info & Map */}
+              {/* Contact Info */}
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -1000,13 +1000,13 @@ export default function HomePage() {
                   <h3 className="text-xl font-bold mb-4 text-blue-900">Get in Touch</h3>
                   <div className="space-y-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                         <Image
                           src="/contact-email.png"
                           alt="Email"
                           width={20}
                           height={20}
-                          className="w-5 h-5 object-contain"
+                          className="w-8 h-8 object-contain"
                         />
                       </div>
                       <div>
@@ -1015,13 +1015,13 @@ export default function HomePage() {
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                         <Image
                           src="/contact-phone.png"
                           alt="Phone"
                           width={20}
                           height={20}
-                          className="w-5 h-5 object-contain"
+                          className="w-8 h-8 object-contain"
                         />
                       </div>
                       <div>
@@ -1030,13 +1030,13 @@ export default function HomePage() {
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                         <Image
                           src="/contact-location.png"
                           alt="Location"
                           width={20}
                           height={20}
-                          className="w-5 h-5 object-contain"
+                          className="w-8 h-8 object-contain"
                         />
                       </div>
                       <div>
@@ -1061,7 +1061,7 @@ export default function HomePage() {
                         href={social.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white hover:shadow-lg transition-shadow"
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-white hover:shadow-lg transition-shadow backdrop-blur-sm bg-white/20"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -1070,30 +1070,10 @@ export default function HomePage() {
                           alt={social.label}
                           width={20}
                           height={20}
-                          className="w-5 h-5 object-contain"
+                          className="w-9 h-9 object-contain rounded-lg"
                         />
                       </motion.a>
                     ))}
-                  </div>
-                </div>
-
-                {/* Map Placeholder */}
-                <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                  <h3 className="text-xl font-bold mb-4 text-blue-900">Our Location</h3>
-                  <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-2">
-                        <Image
-                          src="/map-placeholder.png"
-                          alt="Map"
-                          width={64}
-                          height={64}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <div className="text-gray-600">Interactive Map</div>
-                      <div className="text-sm text-gray-500">Coming Soon</div>
-                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -1109,13 +1089,13 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
               {/* Company Info */}
               <div className="md:col-span-2">
-                <div className="flex items-center space-x-3 mb-4">
+                <div className="flex items-center space-x-3 mb-4 bg-white/10 p-2 rounded-lg h-10 w-max">
                   <Image
                     src="/logo.png"
                     alt="Rawat Innovations Logo"
                     width={32}
                     height={32}
-                    className="rounded-full"
+                    className="rounded-lg"
                   />
                   <span className="text-xl font-bold">Rawat Innovations</span>
                 </div>
@@ -1133,8 +1113,7 @@ export default function HomePage() {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
-                      whileHover={{ scale: 1.1 }}
+                      className="w-8 h-8 flex items-center justify-center transition-colors"
                       whileTap={{ scale: 0.9 }}
                     >
                       <Image
@@ -1142,7 +1121,7 @@ export default function HomePage() {
                         alt="Social Media"
                         width={16}
                         height={16}
-                        className="w-4 h-4 object-contain"
+                        className="w-8 h-8 object-contain"
                       />
                     </motion.a>
                   ))}
@@ -1152,7 +1131,7 @@ export default function HomePage() {
               {/* Quick Links */}
               <div>
                 <h4 className="text-lg font-bold mb-4">Quick Links</h4>
-                <ul className="space-y-2">
+                <ul className="space-y-2 text-font-medium">
                   {[
                     { label: 'About Us', id: 'about' },
                     { label: 'Services', id: 'services' },
