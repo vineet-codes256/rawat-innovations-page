@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // Performance optimizations
@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   },
   // Compression and optimization
   compress: true,
+  swcMinify: true,
   poweredByHeader: false,
   // Experimental features for better performance
   experimental: {

@@ -1,7 +1,7 @@
-import { MetadataRoute } from 'next'
+import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://rawatinnovations.com'
+  const baseUrl = 'https://rawatinnovations.com';
 
   return [
     {
@@ -40,5 +40,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
-  ]
+  ];
 }

@@ -1,6 +1,6 @@
-"use client";
-import React from "react";
-import { motion } from "framer-motion";
+'use client';
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const FloatingElements: React.FC = () => {
   const elements = [
@@ -31,7 +31,7 @@ const FloatingElements: React.FC = () => {
             duration: element.duration,
             repeat: Infinity,
             delay: element.delay,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         >
           <div
@@ -55,7 +55,7 @@ const FloatingElements: React.FC = () => {
         transition={{
           duration: 12,
           repeat: Infinity,
-          ease: "linear",
+          ease: 'linear',
         }}
       >
         <div className="w-32 h-32 border-2 border-blue-400 rotate-45 glass" />
@@ -70,7 +70,7 @@ const FloatingElements: React.FC = () => {
         transition={{
           duration: 15,
           repeat: Infinity,
-          ease: "linear",
+          ease: 'linear',
         }}
       >
         <div className="w-24 h-24 border-2 border-blue-500 rounded-full glass" />
@@ -86,13 +86,14 @@ const FloatingElements: React.FC = () => {
         transition={{
           duration: 8,
           repeat: Infinity,
-          ease: "easeInOut",
+          ease: 'easeInOut',
         }}
       >
         <div
           className="w-96 h-96 rounded-full blur-3xl"
           style={{
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
+            background:
+              'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
           }}
         />
       </motion.div>

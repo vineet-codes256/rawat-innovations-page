@@ -14,13 +14,14 @@ const STATIC_ASSETS = [
   '/vercel.svg',
   '/window.svg',
   '/globe.svg',
-  '/file.svg'
+  '/file.svg',
 ];
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE)
+    caches
+      .open(STATIC_CACHE)
       .then((cache) => {
         return cache.addAll(STATIC_ASSETS);
       })
@@ -33,17 +34,20 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    caches
+      .keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+      .then(() => {
+        return self.clients.claim();
+      })
   );
 });
 
@@ -65,7 +69,10 @@ self.addEventListener('fetch', (event) => {
   } else if (url.pathname.match(/\.(css|js)$/)) {
     // Stale-while-revalidate for CSS/JS
     event.respondWith(staleWhileRevalidate(request, STATIC_CACHE));
-  } else if (url.pathname === '/' || url.pathname.match(/\/(about|services|portfolio|blog|contact)/)) {
+  } else if (
+    url.pathname === '/' ||
+    url.pathname.match(/\/(about|services|portfolio|blog|contact)/)
+  ) {
     // Network-first for pages
     event.respondWith(networkFirst(request, DYNAMIC_CACHE));
   } else {
@@ -92,7 +99,10 @@ async function cacheFirst(request, cacheName) {
     console.error('Cache-first strategy failed:', error);
     // Return offline fallback if available
     if (request.destination === 'document') {
-      return caches.match('/offline.html') || new Response('Offline', { status: 503 });
+      return (
+        caches.match('/offline.html') ||
+        new Response('Offline', { status: 503 })
+      );
     }
     return new Response('', { status: 404 });
   }
@@ -115,7 +125,10 @@ async function networkFirst(request, cacheName) {
     }
     // Return offline fallback for pages
     if (request.destination === 'document') {
-      return caches.match('/offline.html') || new Response('Offline', { status: 503 });
+      return (
+        caches.match('/offline.html') ||
+        new Response('Offline', { status: 503 })
+      );
     }
     return new Response('', { status: 404 });
   }
