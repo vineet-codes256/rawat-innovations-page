@@ -1,7 +1,7 @@
 {
   "name": "Rawat Innovations - Professional Software Solutions",
   "short_name": "Rawat Innovations",
-  "description": "Leading software development company specializing in web applications, mobile apps, and digital solutions for businesses worldwide.",
+  "description": "Emerging software development company developing web applications, mobile apps, and digital solutions for businesses worldwide.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -40,7 +40,7 @@
     {
       "name": "Our Services",
       "short_name": "Services",
-      "description": "Explore our software development services",
+      "description": "Explore our planned software development services",
       "url": "/#services",
       "icons": [
         {
@@ -52,7 +52,7 @@
     {
       "name": "Portfolio",
       "short_name": "Portfolio",
-      "description": "View our completed projects",
+      "description": "View our vision for innovative projects",
       "url": "/#portfolio",
       "icons": [
         {

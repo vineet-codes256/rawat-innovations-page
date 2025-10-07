@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rawat Innovations | Multi-Sector Technology Solutions | Software, Gaming, Tourism Tech, AgriTech",
-  description: "Leading multi-sector technology company specializing in software development, gaming solutions, tourism technology, agritech innovations, and digital services. Building moonshot products for tomorrow.",
+  title: "Rawat Innovations | Emerging Multi-Sector Technology Startup | Software, Gaming, Tourism Tech, AgriTech",
+  description: "Emerging multi-sector technology startup developing innovative software solutions, gaming experiences, tourism technology, agritech innovations, and digital services. Seeking investors and funding for moonshot products.",
   keywords: [
     "technology solutions",
     "software development",
@@ -35,7 +35,29 @@ export const metadata: Metadata = {
     "multi-sector technology",
     "innovative software",
     "tech startup",
-    "digital transformation"
+    "digital transformation",
+    "emerging technology",
+    "startup funding",
+    "venture capital",
+    "tech investment",
+    "innovative startup",
+    "business investment",
+    "technology innovation",
+    "startup opportunities",
+    "investor relations",
+    "tech entrepreneur",
+    "startup Uttarakhand",
+    "best startup Uttarakhand",
+    "innovation Uttarakhand",
+    "technology startup Uttarakhand",
+    "emerging startup Uttarakhand",
+    "venture capital Uttarakhand",
+    "investor Uttarakhand",
+    "tech innovation Uttarakhand",
+    "startup funding Uttarakhand",
+    "Uttarakhand startup ecosystem",
+    "Uttarakhand technology",
+    "Uttarakhand innovation hub"
   ],
   authors: [{ name: "Vineet Rawat", url: "https://rawatinnovations.com" }],
   creator: "Vineet Rawat",
@@ -50,8 +72,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "Rawat Innovations | Multi-Sector Technology Solutions",
-    description: "Leading multi-sector technology company building innovative solutions in software, gaming, tourism tech, agritech, and digital services.",
+    title: "Rawat Innovations | Emerging Multi-Sector Technology Startup",
+    description: "Emerging multi-sector technology startup developing innovative solutions in software, gaming, tourism tech, agritech, and digital services. Seeking investors and funding.",
     url: "https://rawatinnovations.com",
     siteName: "Rawat Innovations",
     images: [
@@ -67,8 +89,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rawat Innovations | Multi-Sector Technology Solutions",
-    description: "Leading multi-sector technology company building innovative solutions in software, gaming, tourism tech, agritech, and digital services.",
+    title: "Rawat Innovations | Emerging Multi-Sector Technology Startup",
+    description: "Emerging multi-sector technology startup developing innovative solutions in software, gaming, tourism tech, agritech, and digital services. Seeking investors and funding.",
     images: ["/og-image.png"],
     creator: "@ripl_in",
     site: "@ripl_in",
@@ -161,7 +183,7 @@ export default function RootLayout({
               "name": "Rawat Innovations Pvt. Ltd.",
               "url": "https://rawatinnovations.com",
               "logo": "https://rawatinnovations.com/logo.png",
-              "description": "Leading multi-sector technology company specializing in software development, gaming solutions, tourism technology, agritech innovations, and digital services.",
+              "description": "Emerging multi-sector technology company developing innovative software solutions, gaming experiences, tourism technology, agritech innovations, and digital services.",
               "foundingDate": "2025",
               "founder": {
                 "@type": "Person",
@@ -170,7 +192,8 @@ export default function RootLayout({
               },
               "address": {
                 "@type": "PostalAddress",
-                "addressCountry": "IN"
+                "addressCountry": "IN",
+                "addressRegion": "Uttarakhand"
               },
               "contactPoint": {
                 "@type": "ContactPoint",
@@ -193,7 +216,15 @@ export default function RootLayout({
                 "Web Development",
                 "Mobile Applications",
                 "Cloud Computing",
-                "Blockchain Technology"
+                "Blockchain Technology",
+                "Startup Funding",
+                "Venture Capital",
+                "Technology Innovation",
+                "Emerging Technologies",
+                "Investor Relations",
+                "Uttarakhand Startup",
+                "Uttarakhand Innovation",
+                "Uttarakhand Technology"
               ],
               "hasOfferCatalog": {
                 "@type": "OfferCatalog",
@@ -256,7 +287,7 @@ export default function RootLayout({
                   "name": "What services does Rawat Innovations offer?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Rawat Innovations offers multi-sector technology solutions including software development, game design, tourism technology, agritech innovations, and digital services. We specialize in creating innovative solutions across diverse industries."
+                    "text": "Rawat Innovations is an emerging technology company with ambitious plans to offer multi-sector technology solutions including software development, game design, tourism technology, agritech innovations, and digital services. We aim to create innovative solutions across diverse industries."
                   }
                 },
                 {
@@ -277,12 +308,28 @@ export default function RootLayout({
                 },
                 {
                   "@type": "Question",
+                  "name": "Is Rawat Innovations seeking investment?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, as an emerging technology startup founded in 2025, Rawat Innovations is actively seeking investors, venture capital, and funding opportunities to accelerate the development of our innovative multi-sector technology solutions."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Where is Rawat Innovations based?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Rawat Innovations is based in Uttarakhand, India, and is proud to be part of the emerging startup ecosystem in the region while serving clients globally."
+                  }
+                },
+                {
+                  "@type": "Question",
                   "name": "How can I contact Rawat Innovations?",
                   "acceptedAnswer": {
                     "@type": "Answer",
                     "text": "You can contact Rawat Innovations through our website contact form, email us at info@rawatinnovations.com, or connect with us on LinkedIn, Twitter, and Instagram."
                   }
-                }
+                },,
               ]
             })
           }}
