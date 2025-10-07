@@ -193,7 +193,7 @@ export default function HomePage() {
                   {/* Main Headline */}
                   <motion.h1
                     id="hero-heading"
-                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 mt-9 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.8 }}
