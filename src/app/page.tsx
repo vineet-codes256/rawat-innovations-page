@@ -1,6 +1,4 @@
 "use client";
-// Rawat Innovations - Professional Multi-Section Website
-// Complete redesign based on wireframe specifications
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -179,7 +177,7 @@ export default function HomePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.8 }}
                 >
-                  Rawat Innovations Pvt. Ltd. – Leading multi-sector technology company delivering cutting-edge software development, gaming solutions, tourism technology, agritech innovations, and comprehensive digital services for businesses worldwide.
+                  Rawat Innovations Pvt. Ltd. - Emerging multi-sector technology company developing innovative software solutions, gaming experiences, tourism technology, agritech innovations, and digital services to empower businesses worldwide.
                 </motion.p>
 
                 {/* CTA Buttons */}
@@ -270,7 +268,7 @@ export default function HomePage() {
             >
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-blue-900">About Rawat Innovations</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Founded in 2025, Rawat Innovations is a leading technology company specializing in software development, gaming solutions, tourism technology, agritech innovations, and digital transformation services. We bridge cutting-edge technology with real-world business needs to deliver innovative solutions that drive growth and empower communities across multiple industries.
+                Founded in 2025, Rawat Innovations is an emerging technology company with ambitious plans in software development, gaming solutions, tourism technology, agritech innovations, and digital transformation services. We aim to bridge innovative technology with real-world business needs to create solutions that drive growth and empower communities across multiple industries.
               </p>
             </motion.div>
 
@@ -292,7 +290,7 @@ export default function HomePage() {
                 <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                   <h3 className="text-2xl font-bold mb-4 text-blue-900">Our Vision</h3>
                   <p className="text-gray-700">
-                    To become the leading technology catalyst for digital transformation, creating groundbreaking software products, gaming experiences, tourism technology solutions, agritech innovations, and digital services that redefine possibilities and empower businesses worldwide.
+                    To become a key technology catalyst for digital transformation, creating innovative software products, gaming experiences, tourism technology solutions, agritech innovations, and digital services that redefine possibilities and empower businesses worldwide.
                   </p>
                 </div>
               </motion.div>
