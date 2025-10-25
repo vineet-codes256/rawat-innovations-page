@@ -1211,7 +1211,9 @@ export default function HomePage() {
                           <div className="font-semibold text-blue-900">
                             Phone
                           </div>
-                          <div className="text-gray-700">+91 XXXXX XXXXX</div>
+                          <a href="tel:+9101354093357" className="text-blue-600 hover:underline">
+                            +91-01354-093357
+                          </a>
                         </div>
                       </div>
                       <div className="flex items-center">
@@ -1389,7 +1391,11 @@ export default function HomePage() {
                 </ul>
                 <div className="text-sm text-blue-200">
                   <p>info@rawatinnovations.com</p>
-                  <p>+91 XXXXX XXXXX</p>
+                  <p>
+                    <a href="tel:+9101354093357" className="text-blue-600 hover:underline">
+                      +91-01354-093357
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
