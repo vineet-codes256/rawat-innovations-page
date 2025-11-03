@@ -9,11 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en-US",
-  "categories": [
-    "business",
-    "productivity",
-    "utilities"
-  ],
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "/logo.png",
