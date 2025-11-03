@@ -40,9 +40,9 @@ Rawat Innovations is committed to bridging innovative technology with real-world
 - **LocalBizLabs**: Professional web development agency specializing in modern websites, e-commerce platforms, and digital solutions for local businesses. [Visit LocalBizLabs →](https://localbizlabs.com)
 - **Software Development**: Custom applications, SaaS platforms, and enterprise solutions built with modern technologies.
 - **Game Design**: Immersive gaming experiences for mobile, desktop, and console platforms via WinitStudios. [Visit WinitStudios →](https://winitstudios.com)
-- **Tourism-Tech**: Smart travel solutions promoting culture and enhancing accessibility worldwide. *(Coming Soon)*
-- **Digital Services**: Branding, consulting, content creation, and comprehensive digital transformation. *(Coming Soon)*
-- **AgriTech Innovation**: IoT-powered agriculture solutions, AI tools, and rural empowerment initiatives. *(Coming Soon)*
+- **Tourism-Tech**: Smart travel solutions promoting culture and enhancing accessibility worldwide. _(Coming Soon)_
+- **Digital Services**: Branding, consulting, content creation, and comprehensive digital transformation. _(Coming Soon)_
+- **AgriTech Innovation**: IoT-powered agriculture solutions, AI tools, and rural empowerment initiatives. _(Coming Soon)_
 
 ## Vision & Projects
 
@@ -309,7 +309,7 @@ Follow our social media to stay updated on opportunities!
 **Vineet Rawat** - Founder & CEO  
 📧 [info@rawatinnovations.com](mailto:info@rawatinnovations.com)  
 📞 [+91-01354-093357](tel:+910135409357)  
-📍 Uttarakhand, India  
+📍 Uttarakhand, India
 
 ### Social Media
 
@@ -396,4 +396,4 @@ Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ---
 
 **Built with ❤️ by Rawat Innovations Pvt. Ltd.**  
-*Innovating Today for a Smarter Tomorrow*
+_Innovating Today for a Smarter Tomorrow_

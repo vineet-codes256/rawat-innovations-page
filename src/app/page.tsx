@@ -672,7 +672,11 @@ export default function HomePage() {
                     whileHover={{ y: -8 }}
                     onClick={() => {
                       if (project.url) {
-                        window.open(project.url, '_blank', 'noopener,noreferrer');
+                        window.open(
+                          project.url,
+                          '_blank',
+                          'noopener,noreferrer'
+                        );
                       }
                     }}
                   >
@@ -695,14 +699,15 @@ export default function HomePage() {
                           {project.category}
                         </span>
                         <span
-                          className={`text-sm font-medium px-3 py-1 rounded-full ${project.status === 'Planning'
+                          className={`text-sm font-medium px-3 py-1 rounded-full ${
+                            project.status === 'Planning'
                               ? 'text-orange-600 bg-orange-100'
                               : project.status === 'Research'
                                 ? 'text-purple-600 bg-purple-100'
                                 : project.status === 'Design'
                                   ? 'text-green-600 bg-green-100'
                                   : 'text-gray-600 bg-gray-100'
-                            }`}
+                          }`}
                         >
                           {project.status}
                         </span>
@@ -1216,7 +1221,10 @@ export default function HomePage() {
                           <div className="font-semibold text-blue-900">
                             Phone
                           </div>
-                          <a href="tel:+9101354093357" className="text-blue-600 hover:underline">
+                          <a
+                            href="tel:+9101354093357"
+                            className="text-blue-600 hover:underline"
+                          >
                             +91-01354-093357
                           </a>
                         </div>
@@ -1397,7 +1405,10 @@ export default function HomePage() {
                 <div className="text-sm text-blue-200">
                   <p>info@rawatinnovations.com</p>
                   <p>
-                    <a href="tel:+9101354093357" className="text-blue-600 hover:underline">
+                    <a
+                      href="tel:+9101354093357"
+                      className="text-blue-600 hover:underline"
+                    >
                       +91-01354-093357
                     </a>
                   </p>
