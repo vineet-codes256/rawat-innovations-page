@@ -1,4 +1,4 @@
-# Rawat Innovations Pvt. Ltd.
+# Rawat Innovations Pvt Ltd
 
 ![Rawat Innovations Logo](public/logo.png)
 

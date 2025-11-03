@@ -1,8 +1,8 @@
 // Service Worker for Rawat Innovations
 // Implements caching strategies for optimal performance
 
-const STATIC_CACHE = 'rawat-innovations-static-v1.0.0';
-const DYNAMIC_CACHE = 'rawat-innovations-dynamic-v1.0.0';
+const STATIC_CACHE = 'rawat-innovations-static-v1.0.1';
+const DYNAMIC_CACHE = 'rawat-innovations-dynamic-v1.0.1';
 
 // Resources to cache immediately
 const STATIC_ASSETS = [
@@ -15,6 +15,7 @@ const STATIC_ASSETS = [
   '/window.svg',
   '/globe.svg',
   '/file.svg',
+  '/offline.html',
 ];
 
 // Install event - cache static assets
@@ -61,6 +62,9 @@ self.addEventListener('fetch', (event) => {
 
   // Skip cross-origin requests
   if (url.origin !== location.origin) return;
+
+  // Let Next.js handle its own assets for best compatibility
+  if (url.pathname.startsWith('/_next/')) return;
 
   // Handle different resource types
   if (url.pathname.match(/\.(png|jpg|jpeg|svg|gif|webp|ico)$/)) {

@@ -124,27 +124,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="canonical" href="https://rawatinnovations.com" />
         <meta name="theme-color" content="#3b82f6" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=5"
-        />
-
-        {/* Performance optimizations - Critical resource hints */}
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-          crossOrigin=""
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin=""
         />
 
         {/* Preload critical resources */}
@@ -154,7 +139,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              if ('serviceWorker' in navigator) {
+              if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js')
                     .then(function(registration) {
@@ -351,8 +336,7 @@ export default function RootLayout({
                     '@type': 'Answer',
                     text: 'You can contact Rawat Innovations through our website contact form, email us at info@rawatinnovations.com, or connect with us on LinkedIn, Twitter, and Instagram.',
                   },
-                },
-                ,
+                }
               ],
             }),
           }}

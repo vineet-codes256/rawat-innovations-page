@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
   },
   // Compression and optimization
   compress: true,
-  swcMinify: true,
   poweredByHeader: false,
   // Experimental features for better performance
   experimental: {
@@ -39,6 +38,19 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
+          },
+          // Additional hardening
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-origin',
           },
         ],
       },

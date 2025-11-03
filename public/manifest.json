@@ -9,7 +9,11 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en-US",
-  "categories": ["business", "productivity", "utilities"],
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "/logo.png",
@@ -24,6 +28,9 @@
       "purpose": "any maskable"
     }
   ],
+  "apple": {
+    "touch_icon": "/logo.png"
+  },
   "shortcuts": [
     {
       "name": "Contact Us",
@@ -62,20 +69,5 @@
       ]
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshot-mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Rawat Innovations mobile homepage"
-    },
-    {
-      "src": "/screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Rawat Innovations desktop homepage"
-    }
-  ]
+  "screenshots": []
 }
