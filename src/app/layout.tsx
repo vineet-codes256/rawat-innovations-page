@@ -336,15 +336,13 @@ export default function RootLayout({
                     '@type': 'Answer',
                     text: 'You can contact Rawat Innovations through our website contact form, email us at info@rawatinnovations.com, or connect with us on LinkedIn, Twitter, and Instagram.',
                   },
-                }
+                },
               ],
             }),
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorBoundary>{children}</ErrorBoundary>
         <Analytics />
       </body>
