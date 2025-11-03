@@ -609,6 +609,7 @@ export default function HomePage() {
                     imageSrc: '/project-nearby-connect.png',
                     imageAlt: 'Nearby Connect Social App',
                     timeline: 'Q4 2025',
+                    url: 'https://www.karmicinnovations.com/',
                   },
                   {
                     title: 'AI-Powered Analytics Platform',
@@ -669,6 +670,11 @@ export default function HomePage() {
                     transition={{ duration: 0.6, delay: idx * 0.1 }}
                     className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 overflow-hidden"
                     whileHover={{ y: -8 }}
+                    onClick={() => {
+                      if (project.url) {
+                        window.open(project.url, '_blank', 'noopener,noreferrer');
+                      }
+                    }}
                   >
                     <div className="h-48 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center relative">
                       <Image
@@ -689,15 +695,14 @@ export default function HomePage() {
                           {project.category}
                         </span>
                         <span
-                          className={`text-sm font-medium px-3 py-1 rounded-full ${
-                            project.status === 'Planning'
+                          className={`text-sm font-medium px-3 py-1 rounded-full ${project.status === 'Planning'
                               ? 'text-orange-600 bg-orange-100'
                               : project.status === 'Research'
                                 ? 'text-purple-600 bg-purple-100'
                                 : project.status === 'Design'
                                   ? 'text-green-600 bg-green-100'
                                   : 'text-gray-600 bg-gray-100'
-                          }`}
+                            }`}
                         >
                           {project.status}
                         </span>
