@@ -1,14 +1,7 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-
-// Client-only dynamic load to keep heavy animation out of initial server render
-const FloatingElements = dynamic(() => import('./FloatingElements'), {
-  ssr: false,
-  loading: () => null,
-});
 
 export default function HomePageClient() {
   const [isMobile, setIsMobile] = useState(false);
@@ -25,13 +18,13 @@ export default function HomePageClient() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Smooth scroll with offset for fixed header
-  const scrollToSection = (sectionId: string) => {
+  // Smooth scroll with offset for fixed header - wrapped in useCallback
+  const scrollToSection = useCallback((sectionId: string) => {
     if (typeof window === 'undefined' || typeof document === 'undefined')
       return;
     const element = document.getElementById(sectionId);
     if (element) {
-      const headerOffset = isMobile ? 80 : 100;
+      const headerOffset = window.innerWidth < 768 ? 80 : 100;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition =
         elementPosition + window.pageYOffset - headerOffset;
@@ -42,47 +35,65 @@ export default function HomePageClient() {
       });
       setCurrentSection(sectionId);
     }
-  };
+  }, []);
 
-  // Touch gesture support for mobile
+  // Touch gesture support for mobile with passive listeners
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientY);
-  };
+  // Optimize event listeners
+  useEffect(() => {
+    if (!isMobile) return;
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientY);
-  };
+    const handleTouchEnd = () => {
+      if (!touchStart || !touchEnd) return;
 
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+      const distance = touchStart - touchEnd;
+      const isUpSwipe = distance > 50;
+      const isDownSwipe = distance < -50;
 
-    const distance = touchStart - touchEnd;
-    const isUpSwipe = distance > 50;
-    const isDownSwipe = distance < -50;
+      const sections = [
+        'home',
+        'about',
+        'services',
+        'portfolio',
+        'blog',
+        'contact',
+      ];
+      const currentIndex = sections.indexOf(currentSection);
 
-    const sections = [
-      'home',
-      'about',
-      'services',
-      'portfolio',
-      'blog',
-      'contact',
-    ];
-    const currentIndex = sections.indexOf(currentSection);
+      if (isUpSwipe && currentIndex < sections.length - 1) {
+        scrollToSection(sections[currentIndex + 1]);
+      } else if (isDownSwipe && currentIndex > 0) {
+        scrollToSection(sections[currentIndex - 1]);
+      }
 
-    if (isUpSwipe && currentIndex < sections.length - 1) {
-      scrollToSection(sections[currentIndex + 1]);
-    } else if (isDownSwipe && currentIndex > 0) {
-      scrollToSection(sections[currentIndex - 1]);
-    }
-  };
+      // Reset touch states
+      setTouchStart(0);
+      setTouchEnd(0);
+    };
+
+    const options: AddEventListenerOptions = { passive: true };
+    const handlePassiveTouchStart = (e: TouchEvent) => {
+      setTouchStart(e.touches[0].clientY);
+    };
+    const handlePassiveTouchMove = (e: TouchEvent) => {
+      setTouchEnd(e.touches[0].clientY);
+    };
+
+    document.addEventListener('touchstart', handlePassiveTouchStart, options);
+    document.addEventListener('touchmove', handlePassiveTouchMove, options);
+    document.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      document.removeEventListener('touchstart', handlePassiveTouchStart);
+      document.removeEventListener('touchmove', handlePassiveTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isMobile, touchStart, touchEnd, currentSection, scrollToSection]);
 
   return (
     <>
-      <FloatingElements />
       {/* Skip Navigation Link */}
       <a
         href="#main-content"
@@ -91,61 +102,56 @@ export default function HomePageClient() {
         Skip to main content
       </a>
 
-      <div
-        className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 text-gray-900 font-sans"
-        onTouchStart={isMobile ? handleTouchStart : undefined}
-        onTouchMove={isMobile ? handleTouchMove : undefined}
-        onTouchEnd={isMobile ? handleTouchEnd : undefined}
-      >
+      <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 text-gray-900 font-sans">
         {/* Header / Navigation */}
         <header
           className="fixed w-full sm:rounded-full sm:ml-[5%] sm:w-[90%] top-1 z-50 bg-white/20 backdrop-blur-md border-b border-gray-200 shadow-sm"
           role="banner"
         >
           <nav
-            className="container mx-auto px-6 py-4"
+            className="mx-auto py-3 xs:py-3 sm:py-4"
             role="navigation"
             aria-label="Main navigation"
           >
             <div className="flex items-center justify-between">
               {/* Logo */}
-              <motion.div
-                className="flex items-center space-x-3"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: 'spring', stiffness: 400 }}
-              >
+              <div className="flex items-center space-x-2 xs:space-x-2 sm:space-x-3">
                 <Image
                   src="/logo.png"
                   alt="Rawat Innovations Logo"
                   width={40}
                   height={40}
-                  className="rounded-lg bg-transparent"
+                  className="xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg bg-transparent"
                   priority
+                  sizes="(max-width: 640px) 32px, 40px"
                 />
                 <span
-                  className="text-xl font-bold text-blue-900 md:hidden"
+                  className="text-lg xs:text-base sm:text-xl font-bold text-blue-900 md:hidden"
                   aria-label="Rawat Innovations Pvt Ltd"
                 >
                   RIPL
                 </span>
                 <span
-                  className="text-xl font-bold text-blue-900 hidden md:block cursor-default"
+                  className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900 hidden md:block cursor-default whitespace-nowrap"
                   aria-label="Rawat Innovations Pvt Ltd"
                 >
                   Rawat Innovations
                 </span>
-              </motion.div>
+              </div>
 
               {/* CTA Button */}
-              <motion.button
+              <button
                 onClick={() => scrollToSection('contact')}
-                className="bg-blue-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-700 transition-all duration-300 focus-ring shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className="bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                           xs:px-4 xs:py-2 xs:text-sm xs:min-w-[100px] xs:min-h-[44px]
+                           sm:px-5 sm:py-2.5 sm:text-base
+                           md:px-6 md:py-3
+                           lg:px-8 lg:py-3 lg:text-lg"
                 aria-label="Get in touch with Rawat Innovations"
               >
-                Get in Touch
-              </motion.button>
+                <span className="xs:inline sm:hidden">Contact</span>
+                <span className="hidden sm:inline">Get in Touch</span>
+              </button>
             </div>
           </nav>
         </header>
@@ -155,110 +161,94 @@ export default function HomePageClient() {
           {/* Hero Section */}
           <section
             id="home"
-            className="pt-20 sm:pt-24 pb-16 sm:pb-20 relative overflow-hidden"
+            className="relative overflow-hidden
+                       xs:pt-20 xs:pb-12 
+                       sm:pt-24 sm:pb-16 
+                       md:pt-28 md:pb-20
+                       lg:pt-32 lg:pb-24
+                       xl:pt-36 xl:pb-28"
             aria-labelledby="hero-heading"
           >
-            <div className="container mx-auto px-6">
+            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
               <div className="text-center">
-                {/* Background Elements */}
+                {/* Simplified background gradient - no animations */}
                 <div
-                  className="absolute inset-0 overflow-hidden hidden sm:block"
+                  className="absolute inset-0 overflow-hidden hidden sm:block opacity-30"
                   aria-hidden="true"
                 >
-                  <motion.div
-                    className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl"
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.3, 0.6, 0.3],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                  />
-                  <motion.div
-                    className="absolute bottom-20 right-10 w-40 h-40 bg-purple-200/20 rounded-full blur-xl"
-                    animate={{
-                      scale: [1.2, 1, 1.2],
-                      opacity: [0.4, 0.7, 0.4],
-                    }}
-                    transition={{
-                      duration: 5,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                  />
+                  <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl" />
+                  <div className="absolute bottom-20 right-10 w-40 h-40 bg-purple-200/20 rounded-full blur-xl" />
                 </div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="relative z-10 max-w-4xl mx-auto"
-                >
-                  {/* Main Headline */}
-                  <motion.h1
+                <div className="relative z-10 max-w-4xl mx-auto">
+                  {/* Main Headline - Fully responsive */}
+                  <h1
                     id="hero-heading"
-                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 mt-9 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.8 }}
+                    className="font-bold mb-4 sm:mb-6 mt-6 sm:mt-9 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight animate-fadeIn
+                               xs:text-2xl 
+                               sm:text-3xl 
+                               md:text-4xl 
+                               lg:text-5xl 
+                               xl:text-6xl 
+                               2xl:text-7xl
+                               3xl:text-8xl"
                     tabIndex={-1}
                   >
                     Innovating Today for a<br className="hidden sm:block" />{' '}
                     Smarter Tomorrow
-                  </motion.h1>
+                  </h1>
 
                   {/* Subheadline */}
-                  <motion.p
-                    className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 font-light max-w-3xl mx-auto"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.8 }}
+                  <p
+                    className="text-gray-600 mb-6 sm:mb-8 font-light mx-auto animate-fadeIn
+                                xs:text-sm xs:max-w-sm xs:px-2
+                                sm:text-base sm:max-w-xl
+                                md:text-lg md:max-w-2xl
+                                lg:text-xl lg:max-w-3xl
+                                xl:text-2xl
+                                2xl:text-2xl"
                   >
                     Rawat Innovations Pvt. Ltd. - Emerging multi-sector
                     technology company developing innovative software solutions,
                     gaming experiences, tourism technology, agritech
                     innovations, and digital services to empower businesses
                     worldwide.
-                  </motion.p>
+                  </p>
 
                   {/* CTA Buttons */}
-                  <motion.div
-                    className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.8 }}
+                  <div
+                    className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 animate-fadeIn
+                               xs:px-4 sm:px-0"
                     role="group"
                     aria-label="Call to action buttons"
                   >
-                    <motion.button
+                    <button
                       onClick={() => scrollToSection('portfolio')}
-                      className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      className="w-full sm:w-auto bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                                 xs:px-6 xs:py-3 xs:text-sm xs:min-h-[48px]
+                                 sm:px-8 sm:py-4 sm:text-base
+                                 md:px-10 md:py-4
+                                 lg:px-12 lg:py-5 lg:text-lg"
                       aria-label="Explore our vision and projects"
                     >
                       Explore Our Vision
-                    </motion.button>
-                    <motion.button
+                    </button>
+                    <button
                       onClick={() => scrollToSection('contact')}
-                      className="w-full sm:w-auto bg-white text-blue-600 px-6 sm:px-8 py-4 rounded-full font-semibold hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl border-2 border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      className="w-full sm:w-auto bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl border-2 border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                                 xs:px-6 xs:py-3 xs:text-sm xs:min-h-[48px]
+                                 sm:px-8 sm:py-4 sm:text-base
+                                 md:px-10 md:py-4
+                                 lg:px-12 lg:py-5 lg:text-lg"
                       aria-label="Contact Rawat Innovations"
                     >
                       Contact Us
-                    </motion.button>
-                  </motion.div>
+                    </button>
+                  </div>
 
-                  {/* Floating Sector Icons */}
-                  <motion.div
-                    className="flex justify-center space-x-4 sm:space-x-6 md:space-x-8 opacity-60"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.6 }}
-                    transition={{ delay: 0.8, duration: 1 }}
+                  {/* Sector Icons - Responsive */}
+                  <div
+                    className="flex justify-center flex-wrap gap-3 sm:gap-4 md:gap-6 lg:gap-8 opacity-60 xs:px-2"
                     role="list"
                     aria-label="Technology sectors we serve"
                   >
@@ -288,48 +278,52 @@ export default function HomePageClient() {
                         alt: 'AgriTech Innovation Solutions',
                       },
                     ].map((icon, index) => (
-                      <motion.div
+                      <div
                         key={index}
-                        className="w-10 h-10 sm:w-12 sm:h-12"
+                        className="xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14"
                         role="listitem"
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          delay: index * 0.2,
-                          ease: 'easeInOut',
-                        }}
                       >
                         <Image
                           src={icon.src}
                           alt={icon.alt}
-                          width={48}
-                          height={48}
+                          width={56}
+                          height={56}
                           className="w-full h-full object-contain"
                           loading="lazy"
+                          sizes="(max-width: 640px) 32px, (max-width: 768px) 40px, (max-width: 1024px) 48px, 56px"
                         />
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
-                </motion.div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
 
           {/* About Us Section */}
-          <section id="about" className="py-20 bg-white">
-            <div className="container mx-auto px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
-              >
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-blue-900">
+          <section
+            id="about"
+            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-white"
+          >
+            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+              <div className="text-center xs:mb-8 sm:mb-12 md:mb-16">
+                <h2
+                  className="font-bold mb-4 sm:mb-6 text-blue-900
+                               xs:text-2xl 
+                               sm:text-3xl 
+                               md:text-4xl 
+                               lg:text-5xl
+                               xl:text-5xl"
+                >
                   About Rawat Innovations
                 </h2>
-                <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+                <p
+                  className="text-gray-600 mx-auto
+                              xs:text-sm xs:max-w-sm xs:px-2
+                              sm:text-base sm:max-w-xl
+                              md:text-lg md:max-w-2xl
+                              lg:text-xl lg:max-w-3xl"
+                >
                   Founded in 2025, Rawat Innovations is an emerging technology
                   company with ambitious plans in software development, gaming
                   solutions, tourism technology, agritech innovations, and
@@ -338,22 +332,19 @@ export default function HomePageClient() {
                   that drive growth and empower communities across multiple
                   industries.
                 </p>
-              </motion.div>
+              </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xs:gap-6 sm:gap-8 md:gap-10 lg:gap-12 items-center xs:mb-8 sm:mb-12 md:mb-16">
                 {/* Mission & Vision */}
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="space-y-6"
-                >
-                  <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h3 className="text-2xl font-bold mb-4 text-blue-900">
+                <div className="xs:space-y-4 sm:space-y-6">
+                  <div className="bg-white xs:p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3
+                      className="font-bold mb-3 sm:mb-4 text-blue-900
+                                   xs:text-lg sm:text-xl md:text-2xl"
+                    >
                       Our Mission
                     </h3>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 xs:text-sm sm:text-base leading-relaxed">
                       To democratize innovation through advanced software
                       development, gaming technology, tourism tech solutions,
                       agritech innovations, and comprehensive digital services
@@ -362,11 +353,14 @@ export default function HomePageClient() {
                       societal impact.
                     </p>
                   </div>
-                  <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h3 className="text-2xl font-bold mb-4 text-blue-900">
+                  <div className="bg-white xs:p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3
+                      className="font-bold mb-3 sm:mb-4 text-blue-900
+                                   xs:text-lg sm:text-xl md:text-2xl"
+                    >
                       Our Vision
                     </h3>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 xs:text-sm sm:text-base leading-relaxed">
                       To become a key technology catalyst for digital
                       transformation, creating innovative software products,
                       gaming experiences, tourism technology solutions, agritech
@@ -374,18 +368,12 @@ export default function HomePageClient() {
                       possibilities and empower businesses worldwide.
                     </p>
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Leadership Cards */}
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="space-y-6"
-                >
-                  <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-                    <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-blue-100">
+                <div className="xs:space-y-4 sm:space-y-6">
+                  <div className="bg-white xs:p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+                    <div className="xs:w-16 xs:h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-blue-100">
                       <Image
                         src="/vineet-rawat.png"
                         alt="Vineet Rawat - Founder & CEO of Rawat Innovations"
@@ -393,75 +381,84 @@ export default function HomePageClient() {
                         height={80}
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        sizes="(max-width: 640px) 64px, 80px"
                       />
                     </div>
-                    <h4 className="text-xl font-bold text-blue-900 mb-2">
+                    <h4
+                      className="font-bold text-blue-900 mb-2
+                                   xs:text-lg sm:text-xl"
+                    >
                       Vineet Rawat
                     </h4>
-                    <p className="text-gray-600 mb-2">Founder & CEO</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-gray-600 mb-2 xs:text-sm sm:text-base">
+                      Founder & CEO
+                    </p>
+                    <p className="text-gray-500 xs:text-xs sm:text-sm leading-relaxed">
                       Visionary leader with expertise in technology innovation
                       and entrepreneurial ventures. Handling all aspects of
                       technology innovation, from software development to
                       business strategy.
                     </p>
                   </div>
-                </motion.div>
+                </div>
               </div>
 
               {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="bg-white max-w-4xl mx-auto p-8 rounded-2xl shadow-lg border border-gray-100"
-              >
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="bg-white max-w-4xl mx-auto xs:p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100">
+                <div className="grid grid-cols-2 md:grid-cols-4 xs:gap-4 sm:gap-6 md:gap-8 text-center">
                   {[
                     { number: '2025', label: 'Founded' },
                     { number: '6', label: 'Industries' },
                     { number: '∞', label: 'Limitless Potential' },
                     { number: '1', label: 'Mission' },
                   ].map((stat, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.1, duration: 0.6 }}
-                    >
-                      <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">
+                    <div key={idx}>
+                      <div
+                        className="font-bold text-blue-600 mb-1 sm:mb-2
+                                      xs:text-2xl sm:text-3xl md:text-4xl"
+                      >
                         {stat.number}
                       </div>
-                      <div className="text-gray-600 text-sm">{stat.label}</div>
-                    </motion.div>
+                      <div className="text-gray-600 xs:text-xs sm:text-sm">
+                        {stat.label}
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             </div>
           </section>
 
           {/* Services / Sectors Section */}
-          <section id="services" className="py-20 bg-blue-50/50">
-            <div className="container mx-auto px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
-              >
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-blue-900">
+          <section
+            id="services"
+            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-blue-50/50"
+          >
+            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+              <div className="text-center xs:mb-8 sm:mb-12 md:mb-16">
+                <h2
+                  className="font-bold mb-4 sm:mb-6 text-blue-900
+                               xs:text-2xl 
+                               sm:text-3xl 
+                               md:text-4xl 
+                               lg:text-5xl
+                               xl:text-5xl"
+                >
                   Our Sectors
                 </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                <p
+                  className="text-gray-600 mx-auto
+                              xs:text-sm xs:max-w-sm xs:px-2
+                              sm:text-base sm:max-w-xl
+                              md:text-lg md:max-w-2xl
+                              lg:text-xl lg:max-w-3xl"
+                >
                   We operate across six dynamic sectors, each representing our
                   commitment to innovation and excellence.
                 </p>
-              </motion.div>
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xs:gap-4 sm:gap-6 md:gap-8">
                 {[
                   {
                     title: 'LocalBizLabs',
@@ -518,50 +515,57 @@ export default function HomePageClient() {
                     website: 'Coming Soon',
                   },
                 ].map((item, idx) => (
-                  <motion.div
+                  <div
                     key={idx}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: idx * 0.1 }}
-                    className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100"
-                    whileHover={{ y: -8 }}
+                    className="bg-white xs:p-4 sm:p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl 
+                               transition-shadow duration-200 group cursor-pointer border border-gray-100"
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <motion.div
-                        className="w-12 h-12"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ type: 'spring', stiffness: 400 }}
-                      >
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="xs:w-10 xs:h-10 sm:w-12 sm:h-12">
                         <Image
                           src={item.iconSrc}
                           alt={item.iconAlt}
                           width={48}
                           height={48}
                           className="w-full h-full object-contain"
+                          loading="lazy"
+                          sizes="(max-width: 640px) 40px, 48px"
                         />
-                      </motion.div>
+                      </div>
                       {item.isNew && (
-                        <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                        <span
+                          className="bg-blue-600 text-white xs:text-[10px] sm:text-xs 
+                                       xs:px-1.5 xs:py-0.5 sm:px-2 sm:py-1 rounded-full font-medium"
+                        >
                           NEW
                         </span>
                       )}
                       {item.website === 'Coming Soon' && (
-                        <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                        <span
+                          className="bg-yellow-500 text-white xs:text-[10px] sm:text-xs 
+                                       xs:px-1.5 xs:py-0.5 sm:px-2 sm:py-1 rounded-full font-medium"
+                        >
                           Coming Soon
                         </span>
                       )}
                     </div>
-                    <h3 className="text-2xl font-bold mb-4 text-blue-900 group-hover:text-blue-600 transition-colors">
+                    <h3
+                      className="font-bold mb-3 sm:mb-4 text-blue-900 
+                                   group-hover:text-blue-600 transition-colors
+                                   xs:text-lg sm:text-xl md:text-2xl"
+                    >
                       {item.title}
                     </h3>
-                    <p className="text-gray-700 leading-relaxed mb-4">
+                    <p
+                      className="text-gray-700 leading-relaxed mb-3 sm:mb-4
+                                  xs:text-xs sm:text-sm md:text-base"
+                    >
                       {item.desc}
                     </p>
-                    <motion.button
-                      className="text-blue-600 font-semibold hover:text-blue-800 transition-colors"
-                      whileHover={{ x: 5 }}
-                      transition={{ type: 'spring', stiffness: 400 }}
+                    <button
+                      className="text-blue-600 font-semibold hover:text-blue-800 
+                                 transition-colors xs:text-xs sm:text-sm md:text-base
+                                 min-h-[44px] flex items-center"
                       onClick={() => {
                         if (typeof window !== 'undefined') {
                           window.open(
@@ -573,39 +577,55 @@ export default function HomePageClient() {
                       }}
                     >
                       Learn More
-                    </motion.button>
-                  </motion.div>
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
           </section>
 
           {/* Portfolio / Projects Section */}
-          <section id="portfolio" className="py-20 bg-white">
-            <div className="container mx-auto px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
-              >
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-blue-900">
+          <section
+            id="portfolio"
+            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-white"
+          >
+            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+              <div className="text-center xs:mb-8 sm:mb-12 md:mb-16">
+                <h2
+                  className="font-bold mb-4 sm:mb-6 text-blue-900
+                               xs:text-2xl 
+                               sm:text-3xl 
+                               md:text-4xl 
+                               lg:text-5xl
+                               xl:text-5xl"
+                >
                   Our Vision
                 </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                <p
+                  className="text-gray-600 mx-auto mb-4 sm:mb-6 md:mb-8
+                              xs:text-sm xs:max-w-sm xs:px-2
+                              sm:text-base sm:max-w-xl
+                              md:text-lg md:max-w-2xl
+                              lg:text-xl lg:max-w-3xl"
+                >
                   Bold ideas and moonshot projects shaping the future.
                   We&apos;re currently building the foundation for
                   groundbreaking innovations.
                 </p>
 
                 {/* Status Indicator */}
-                <div className="inline-flex items-center bg-blue-100 text-blue-800 px-6 py-3 rounded-full font-medium mb-8">
+                <div
+                  className="inline-flex items-center bg-blue-100 text-blue-800 
+                               xs:px-3 xs:py-2 xs:text-xs
+                               sm:px-4 sm:py-2 sm:text-sm
+                               md:px-6 md:py-3 md:text-base
+                               rounded-full font-medium"
+                >
                   Currently in Development Phase
                 </div>
-              </motion.div>
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="flex justify-center">
                 {[
                   {
                     title: 'Nearby Connect',
@@ -618,65 +638,11 @@ export default function HomePageClient() {
                     timeline: 'Q4 2025',
                     url: 'https://www.karmicinnovations.com/',
                   },
-                  {
-                    title: 'AI-Powered Analytics Platform',
-                    category: 'Software',
-                    description:
-                      'Revolutionary analytics platform using machine learning for business intelligence.',
-                    status: 'Planning',
-                    imageSrc: '/portfolio-analytics.png',
-                    imageAlt: 'Analytics Platform',
-                    timeline: 'Q1 2026',
-                  },
-                  {
-                    title: 'Immersive VR Training',
-                    category: 'Gaming',
-                    description:
-                      'Virtual reality training solutions for professional skill development.',
-                    status: 'Research',
-                    imageSrc: '/portfolio-vr-training.png',
-                    imageAlt: 'VR Training',
-                    timeline: 'Q2 2026',
-                  },
-                  {
-                    title: 'Smart Tourism App',
-                    category: 'Tourism',
-                    description:
-                      'AI-driven travel companion with cultural insights and accessibility features.',
-                    status: 'Design',
-                    imageSrc: '/portfolio-tourism-app.png',
-                    imageAlt: 'Smart Tourism App',
-                    timeline: 'Q3 2026',
-                  },
-                  {
-                    title: 'Sustainable Fashion Platform',
-                    category: 'Merch',
-                    description:
-                      'Eco-friendly apparel marketplace. Custom designs and sustainable materials.',
-                    status: 'Concept',
-                    imageSrc: '/portfolio-fashion-platform.png',
-                    imageAlt: 'Sustainable Fashion',
-                    timeline: '2027',
-                  },
-                  {
-                    title: 'IoT Agriculture Network',
-                    category: 'AgriTech',
-                    description:
-                      'Connected farming solutions for precision agriculture.',
-                    status: 'Research',
-                    imageSrc: '/portfolio-agriculture-network.png',
-                    imageAlt: 'IoT Agriculture',
-                    timeline: '2027',
-                  },
                 ].map((project, idx) => (
-                  <motion.div
+                  <div
                     key={idx}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: idx * 0.1 }}
-                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 overflow-hidden"
-                    whileHover={{ y: -8 }}
+                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 
+                               group cursor-pointer border border-gray-100 overflow-hidden"
                     onClick={() => {
                       if (project.url && typeof window !== 'undefined') {
                         window.open(
@@ -687,218 +653,124 @@ export default function HomePageClient() {
                       }
                     }}
                   >
-                    <div className="h-48 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center relative">
+                    <div
+                      className="xs:h-36 sm:h-40 md:h-48 bg-gradient-to-br from-blue-50 to-purple-50 
+                                    flex items-center justify-center relative"
+                    >
                       <Image
                         src={project.imageSrc}
                         alt={project.imageAlt}
-                        width={120}
-                        height={120}
-                        className="w-48 h-48 object-contain"
+                        width={192}
+                        height={192}
+                        className="w-full h-full object-contain xs:p-4 sm:p-6"
                         loading="lazy"
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 25vw"
                       />
-                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-blue-600">
+                      <div
+                        className="absolute xs:top-2 xs:right-2 sm:top-4 sm:right-4 
+                                     bg-white/90 backdrop-blur-sm 
+                                     xs:px-2 xs:py-0.5 xs:text-[10px]
+                                     sm:px-3 sm:py-1 sm:text-xs
+                                     rounded-full font-medium text-blue-600"
+                      >
                         {project.timeline}
                       </div>
                     </div>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                    <div className="xs:p-3 sm:p-4 md:p-6">
+                      <div className="flex items-center justify-between mb-2 sm:mb-3">
+                        <span
+                          className="xs:text-[10px] sm:text-xs md:text-sm font-medium 
+                                       text-blue-600 bg-blue-100 
+                                       xs:px-2 xs:py-0.5
+                                       sm:px-3 sm:py-1
+                                       rounded-full"
+                        >
                           {project.category}
                         </span>
                         <span
-                          className={`text-sm font-medium px-3 py-1 rounded-full ${
-                            project.status === 'Planning'
-                              ? 'text-orange-600 bg-orange-100'
-                              : project.status === 'Research'
-                                ? 'text-purple-600 bg-purple-100'
-                                : project.status === 'Design'
-                                  ? 'text-green-600 bg-green-100'
-                                  : 'text-gray-600 bg-gray-100'
-                          }`}
+                          className={`xs:text-[10px] sm:text-xs md:text-sm font-medium 
+                                     xs:px-2 xs:py-0.5
+                                     sm:px-3 sm:py-1
+                                     rounded-full ${
+                                       project.status === 'Planning'
+                                         ? 'text-orange-600 bg-orange-100'
+                                         : project.status === 'Research'
+                                           ? 'text-purple-600 bg-purple-100'
+                                           : project.status === 'Design'
+                                             ? 'text-green-600 bg-green-100'
+                                             : 'text-gray-600 bg-gray-100'
+                                     }`}
                         >
                           {project.status}
                         </span>
                       </div>
-                      <h3 className="text-xl font-bold mb-3 text-blue-900 group-hover:text-blue-600 transition-colors">
+                      <h3
+                        className="font-bold mb-2 sm:mb-3 text-blue-900 
+                                     group-hover:text-blue-600 transition-colors
+                                     xs:text-sm sm:text-base md:text-lg lg:text-xl"
+                      >
                         {project.title}
                       </h3>
-                      <p className="text-gray-700 leading-relaxed">
+                      <p
+                        className="text-gray-700 leading-relaxed
+                                    xs:text-xs sm:text-sm md:text-base"
+                      >
                         {project.description}
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* Blog / Insights Section */}
-          <section id="blog" className="py-20 bg-blue-50/50">
-            <div className="container mx-auto px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
+          {/* Newsletter Signup */}
+          <section
+            id="newsletter"
+            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-blue-50/50"
+          >
+            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+              <div
+                className="bg-white max-w-2xl mx-auto xs:p-4 sm:p-6 md:p-8 
+                              rounded-2xl shadow-lg border border-gray-100 text-center"
               >
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-blue-900">
-                  Insights
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Stay updated with the latest trends, insights, and thought
-                  leadership from Vineet Rawat.
-                </p>
-              </motion.div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-                {/* Featured Article */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="lg:col-span-2 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 overflow-hidden"
-                  whileHover={{ y: -8 }}
+                <h3
+                  className="font-bold xs:mb-2 sm:mb-3 md:mb-4 text-blue-900
+                               xs:text-lg sm:text-xl md:text-2xl"
                 >
-                  <div className="h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                    <Image
-                      src="/blog-featured.png"
-                      alt="Innovation and Technology"
-                      width={700}
-                      height={200}
-                      className="w-100 h-21 object-cover max-h-64"
-                    />
-                  </div>
-                  <div className="p-8">
-                    <div className="flex items-center mb-4">
-                      <span className="text-sm font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full mr-3">
-                        Featured
-                      </span>
-                      <span className="text-sm text-gray-500">5 min read</span>
-                    </div>
-                    <h3 className="text-2xl font-bold mb-4 text-blue-900 group-hover:text-blue-600 transition-colors">
-                      The Future of Multi-Sector Innovation: Building Moonshot
-                      Products
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed mb-4">
-                      Explore how Rawat Innovations is aiming to pioneer
-                      innovation across six diverse sectors, from moonshot
-                      social apps, sustainable fashion platforms, and AI-powered
-                      sustainable agriculture to immersive gaming experiences...
-                    </p>
-                    <div className="flex items-center">
-                      <Image
-                        src="/vineet-rawat.png"
-                        alt="Vineet Rawat"
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mr-3"
-                      />
-                      <div>
-                        <p className="font-semibold text-blue-900">
-                          Vineet Rawat
-                        </p>
-                        <p className="text-sm text-gray-500">CEO & Founder</p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Recent Articles */}
-                <div className="space-y-6">
-                  {[
-                    {
-                      title: 'AI in Agriculture: Revolutionizing Farming',
-                      excerpt:
-                        'How artificial intelligence is transforming traditional farming practices...',
-                      imageSrc: '/blog-ai-agritech.png',
-                      imageAlt: 'AI in Agriculture',
-                      readTime: '3 min read',
-                    },
-                    {
-                      title: 'The Rise of Tourism Technology',
-                      excerpt:
-                        'Exploring how tech is enhancing travel experiences worldwide...',
-                      imageSrc: '/blog-tourism-tech.png',
-                      imageAlt: 'Tourism Technology',
-                      readTime: '4 min read',
-                    },
-                    {
-                      title: 'Sustainable Fashion in the Digital Age',
-                      excerpt:
-                        'How technology is driving eco-friendly fashion innovation...',
-                      imageSrc: '/blog-sustainable-fashion.png',
-                      imageAlt: 'Sustainable Fashion',
-                      readTime: '3 min read',
-                    },
-                  ].map((article, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, x: 30 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: idx * 0.1 }}
-                      className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100"
-                      whileHover={{ x: 8 }}
-                    >
-                      <div className="flex space-x-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                          <Image
-                            src={article.imageSrc}
-                            alt={article.imageAlt}
-                            width={48}
-                            height={48}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-bold mb-2 text-blue-900 group-hover:text-blue-600 transition-colors">
-                            {article.title}
-                          </h4>
-                          <p className="text-gray-700 text-sm leading-relaxed mb-2">
-                            {article.excerpt}
-                          </p>
-                          <span className="text-sm text-gray-500">
-                            {article.readTime}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Newsletter Signup */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="bg-white max-w-2xl mx-auto p-8 rounded-2xl shadow-lg border border-gray-100 text-center"
-              >
-                <h3 className="text-2xl font-bold mb-4 text-blue-900">
                   Stay Updated
                 </h3>
-                <p className="text-gray-700 mb-6">
+                <p
+                  className="text-gray-700 xs:mb-3 sm:mb-4 md:mb-6
+                              xs:text-xs sm:text-sm md:text-base"
+                >
                   Subscribe to our newsletter for the latest insights on
                   technology innovation and industry trends.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row xs:gap-2 sm:gap-3 md:gap-4">
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 xs:px-3 xs:py-2 xs:text-xs
+                               sm:px-4 sm:py-3 sm:text-sm
+                               md:text-base
+                               rounded-lg border border-gray-300 
+                               focus:outline-none focus:ring-2 focus:ring-blue-500
+                               min-h-[44px]"
                   />
-                  <motion.button
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <button
+                    className="bg-blue-600 text-white 
+                               xs:px-4 xs:py-2 xs:text-xs
+                               sm:px-5 sm:py-3 sm:text-sm
+                               md:px-6 md:text-base
+                               rounded-lg font-semibold hover:bg-blue-700 
+                               transition-all duration-300 shadow-lg hover:shadow-xl
+                               min-h-[44px]"
                   >
                     Subscribe
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </section>
 

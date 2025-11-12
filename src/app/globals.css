@@ -80,11 +80,13 @@
 
   /* Improve color contrast */
   .text-gray-600 {
-    color: #374151; /* Better contrast than default gray-600 */
+    color: #374151;
+    /* Better contrast than default gray-600 */
   }
 
   .text-gray-700 {
-    color: #1f2937; /* Better contrast than default gray-700 */
+    color: #1f2937;
+    /* Better contrast than default gray-700 */
   }
 
   /* Ensure minimum touch targets */
@@ -145,9 +147,11 @@
     h1 {
       font-size: 2rem;
     }
+
     h2 {
       font-size: 1.75rem;
     }
+
     h3 {
       font-size: 1.5rem;
     }
@@ -166,6 +170,7 @@
   --blue-primary: #3b82f6;
   --blue-dark: #1d4ed8;
   --blue-light: #dbeafe;
+  background: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -182,6 +187,24 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Enable smooth scrolling on all platforms */
+  scroll-behavior: smooth;
+  /* Set scroll padding to accommodate fixed header */
+  scroll-padding-top: 80px; /* Mobile header height */
+  /* Prevent font size adjustments on orientation change - iOS */
+  -webkit-text-size-adjust: 100%;
+  /* Better text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 100px; /* Desktop header height */
+  }
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -193,39 +216,32 @@ body {
     Roboto,
     sans-serif;
   overflow-x: hidden;
+  /* iOS safe areas */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  /* Improve touch responsiveness */
+  touch-action: manipulation;
 }
 
-/* Glassmorphism utilities */
+/* Simplified glass effects for better performance */
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px var(--glass-shadow);
-}
-
-.glass-strong {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
 }
 
 .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 16px;
-  box-shadow: 0 4px 24px var(--glass-shadow);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.08);
+  transition: box-shadow 0.2s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
-  border-color: var(--blue-primary);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
 }
 
 /* Gradient backgrounds */
@@ -246,41 +262,145 @@ body {
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
 }
 
-@keyframes float-reverse {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  50% {
-    transform: translateY(-15px) rotate(180deg);
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes pulse-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(102, 126, 234, 0.8);
-  }
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
 }
 
 .float {
   animation: float 6s ease-in-out infinite;
 }
 
-.float-reverse {
-  animation: float-reverse 8s ease-in-out infinite;
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn,
+  .float {
+    animation: none !important;
+  }
 }
 
-.pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+/* Platform-specific optimizations */
+
+/* Small mobile devices (320px - 479px) */
+@media (min-width: 320px) and (max-width: 479px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  h1 {
+    font-size: 1.875rem !important;
+    /* 30px */
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+    /* 24px */
+  }
+}
+
+/* Mobile landscape and small tablets (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+/* Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Desktop and larger (1024px+) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Large desktop (1440px+) */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
+  }
+}
+
+/* Ultra-wide (1920px+) */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+  }
+}
+
+/* iOS specific */
+@supports (-webkit-touch-callout: none) {
+  body {
+    /* Fix iOS scroll issues */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  input,
+  textarea,
+  select {
+    /* Prevent iOS zoom on focus */
+    font-size: 16px !important;
+  }
+}
+
+/* Android specific */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+  body {
+    /* Improve Android rendering */
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Landscape orientation */
+@media (orientation: landscape) and (max-height: 500px) {
+  .h-screen {
+    min-height: auto !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print,
+  header,
+  footer,
+  nav {
+    display: none !important;
+  }
 }
 
 /* Custom scrollbar */

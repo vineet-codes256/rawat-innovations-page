@@ -129,32 +129,37 @@ export default function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=5"
+          content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover, user-scalable=yes"
         />
+        {/* iOS specific meta tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="format-detection" content="telephone=no" />
 
         {/* Preload critical resources */}
         <link rel="preload" href="/logo.png" as="image" />
-        <link rel="preload" href="/favicon.ico" as="image" />
 
+        {/* Defer service worker registration */}
         <script
+          defer
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('Service Worker registered successfully:', registration.scope);
-                    })
-                    .catch(function(error) {
+                  setTimeout(function() {
+                    navigator.serviceWorker.register('/sw.js').catch(function(error) {
                       console.log('Service Worker registration failed:', error);
                     });
+                  }, 2000);
                 });
               }
             `,
           }}
         />
+        {/* JSON-LD structured data - defer loading */}
         <script
           type="application/ld+json"
+          defer
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
