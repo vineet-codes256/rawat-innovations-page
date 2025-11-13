@@ -105,7 +105,7 @@ export default function HomePageClient() {
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 text-gray-900 font-sans">
         {/* Header / Navigation */}
         <header
-          className="fixed w-full sm:rounded-full sm:ml-[5%] sm:w-[90%] top-1 z-50 bg-white/20 backdrop-blur-md border-b border-gray-200 shadow-sm"
+          className="fixed w-full sm:rounded-full sm:ml-[10%] sm:w-[80%] top-0 sm:top-4 z-50 bg-white/30 backdrop-blur-sm border-b border-gray-300 shadow-lg scale-100 sm:scale-75 sm:origin-top animate-slideDown"
           role="banner"
         >
           <nav
@@ -113,7 +113,7 @@ export default function HomePageClient() {
             role="navigation"
             aria-label="Main navigation"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-8">
               {/* Logo */}
               <div className="flex items-center space-x-2 xs:space-x-2 sm:space-x-3">
                 <Image
