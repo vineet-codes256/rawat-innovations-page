@@ -693,14 +693,15 @@ export default function HomePageClient() {
                           className={`xs:text-[10px] sm:text-xs md:text-sm font-medium 
                                      xs:px-2 xs:py-0.5
                                      sm:px-3 sm:py-1
-                                     rounded-full ${project.status === 'Planning'
-                              ? 'text-orange-600 bg-orange-100'
-                              : project.status === 'Research'
-                                ? 'text-purple-600 bg-purple-100'
-                                : project.status === 'Design'
-                                  ? 'text-green-600 bg-green-100'
-                                  : 'text-gray-600 bg-gray-100'
-                            }`}
+                                     rounded-full ${
+                                       project.status === 'Planning'
+                                         ? 'text-orange-600 bg-orange-100'
+                                         : project.status === 'Research'
+                                           ? 'text-purple-600 bg-purple-100'
+                                           : project.status === 'Design'
+                                             ? 'text-green-600 bg-green-100'
+                                             : 'text-gray-600 bg-gray-100'
+                                     }`}
                         >
                           {project.status}
                         </span>
@@ -1082,7 +1083,10 @@ export default function HomePageClient() {
                           <div className="font-semibold text-blue-900">
                             Email
                           </div>
-                          <a href="mailto:info@rawatinnovations.com" className="text-blue-600 hover:underline">
+                          <a
+                            href="mailto:info@rawatinnovations.com"
+                            className="text-blue-600 hover:underline"
+                          >
                             info@rawatinnovations.com
                           </a>
                         </div>
@@ -1284,12 +1288,18 @@ export default function HomePageClient() {
                 </ul>
                 <div className="text-sm text-blue-200">
                   <p>
-                    <a href="mailto:info@rawatinnovations.com" className="text-blue-200 hover:underline cursor-pointer">
+                    <a
+                      href="mailto:info@rawatinnovations.com"
+                      className="text-blue-200 hover:underline cursor-pointer"
+                    >
                       info@rawatinnovations.com
                     </a>
                   </p>
                   <p>
-                    <a href="tel:+9101354093357" className="text-blue-200 hover:underline cursor-pointer">
+                    <a
+                      href="tel:+9101354093357"
+                      className="text-blue-200 hover:underline cursor-pointer"
+                    >
                       +91-01354-093357
                     </a>
                   </p>
