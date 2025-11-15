@@ -225,6 +225,36 @@ body {
   touch-action: manipulation;
 }
 
+/* Cursor behavior: default everywhere, pointer only on interactive elements */
+@layer base {
+  html,
+  body {
+    cursor: default;
+  }
+
+  /* Show pointer on clearly interactive controls */
+  a[href],
+  button,
+  [role='button'],
+  summary,
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'] {
+    cursor: pointer;
+  }
+
+  /* Preserve text cursor for text entry/editing */
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='search'],
+  input[type='tel'],
+  textarea,
+  [contenteditable='true'] {
+    cursor: text;
+  }
+}
+
 /* Simplified glass effects for better performance */
 .glass {
   background: rgba(255, 255, 255, 0.8);
@@ -280,18 +310,135 @@ body {
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.6s ease-out forwards;
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.float {
-  animation: float 6s ease-in-out infinite;
+@keyframes droppedFromAbove {
+  0% {
+    opacity: 1;
+    transform: translateY(-80vh);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(30px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-30px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(10px);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.1s ease-out forwards;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.5s ease-out forwards;
+}
+
+.animate-dropIn-0 {
+  opacity: 0;
+  transform: translateY(-80px);
+  animation: droppedFromAbove 2s ease-out forwards;
+}
+
+.animate-dropIn-1 {
+  opacity: 0;
+  transform: translateY(-80px);
+  animation: droppedFromAbove 2s ease-out forwards;
+  animation-delay: 2s;
+}
+
+.animate-dropIn-2 {
+  opacity: 0;
+  transform: translateY(-80px);
+  animation: droppedFromAbove 2s ease-out forwards;
+  animation-delay: 4s;
+}
+
+.animate-dropIn-3 {
+  opacity: 0;
+  transform: translateY(-80px);
+  animation: droppedFromAbove 2s ease-out forwards;
+  animation-delay: 6s;
+}
+
+.animate-dropIn-4 {
+  opacity: 0;
+  transform: translateY(-80px);
+  animation: droppedFromAbove 2s ease-out forwards;
+  animation-delay: 8s;
+}
+
+.animate-dropIn-5 {
+  opacity: 0;
+  transform: translateY(-80px);
+  animation: droppedFromAbove 2s ease-out forwards;
+  animation-delay: 10s;
+}
+
+.animate-wave-0 {
+  animation: float 2.5s ease-in-out infinite;
+  animation-delay: 2s;
+  transform-origin: center bottom;
+}
+
+.animate-wave-1 {
+  animation: float 2.5s ease-in-out infinite;
+  animation-delay: 2.2s;
+  transform-origin: center bottom;
+}
+
+.animate-wave-2 {
+  animation: float 2.5s ease-in-out infinite;
+  animation-delay: 2.4s;
+  transform-origin: center bottom;
+}
+
+.animate-wave-3 {
+  animation: float 2.5s ease-in-out infinite;
+  animation-delay: 2.6s;
+  transform-origin: center bottom;
+}
+
+.animate-wave-4 {
+  animation: float 2.5s ease-in-out infinite;
+  animation-delay: 2.8s;
+  transform-origin: center bottom;
+}
+
+.animate-wave-5 {
+  animation: float 2.5s ease-in-out infinite;
+  animation-delay: 3s;
+  transform-origin: center bottom;
 }
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   .animate-fadeIn,
-  .float {
+  .animate-float,
+  .animate-slideDown {
     animation: none !important;
   }
 }

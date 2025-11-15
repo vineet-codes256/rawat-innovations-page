@@ -105,7 +105,7 @@ export default function HomePageClient() {
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 text-gray-900 font-sans">
         {/* Header / Navigation */}
         <header
-          className="fixed w-full sm:rounded-full sm:ml-[10%] sm:w-[80%] top-0 sm:top-4 z-50 bg-white/30 backdrop-blur-sm border-b border-gray-300 shadow-lg scale-100 sm:scale-75 sm:origin-top animate-slideDown"
+          className="fixed w-full sm:rounded-full sm:ml-[10%] sm:w-[80%] top-0 sm:top-4 z-50 bg-white/30 backdrop-blur-md border-b border-gray-300 shadow-lg scale-100 sm:scale-75 sm:origin-top animate-slideDown"
           role="banner"
         >
           <nav
@@ -121,7 +121,7 @@ export default function HomePageClient() {
                   alt="Rawat Innovations Logo"
                   width={40}
                   height={40}
-                  className="xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg bg-transparent"
+                  className="xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg bg-transparent object-contain"
                   priority
                   sizes="(max-width: 640px) 32px, 40px"
                 />
@@ -146,7 +146,8 @@ export default function HomePageClient() {
                            xs:px-4 xs:py-2 xs:text-sm xs:min-w-[100px] xs:min-h-[44px]
                            sm:px-5 sm:py-2.5 sm:text-base
                            md:px-6 md:py-3
-                           lg:px-8 lg:py-3 lg:text-lg"
+                           lg:px-8 lg:py-3 lg:text-lg
+                           shadow-blue-300/50 hover:shadow-blue-400/50 shadow-lg"
                 aria-label="Get in touch with Rawat Innovations"
               >
                 <span className="xs:inline sm:hidden">Contact</span>
@@ -191,7 +192,8 @@ export default function HomePageClient() {
                                lg:text-5xl 
                                xl:text-6xl 
                                2xl:text-7xl
-                               3xl:text-8xl"
+                               3xl:text-8xl
+                               "
                     tabIndex={-1}
                   >
                     Innovating Today for a<br className="hidden sm:block" />{' '}
@@ -280,7 +282,7 @@ export default function HomePageClient() {
                     ].map((icon, index) => (
                       <div
                         key={index}
-                        className="xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14"
+                        className={`xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 animate-dropIn-${index}`}
                         role="listitem"
                       >
                         <Image
@@ -288,7 +290,7 @@ export default function HomePageClient() {
                           alt={icon.alt}
                           width={56}
                           height={56}
-                          className="w-full h-full object-contain"
+                          className={`w-full h-full object-contain animate-wave-${index}`}
                           loading="lazy"
                           sizes="(max-width: 640px) 32px, (max-width: 768px) 40px, (max-width: 1024px) 48px, 56px"
                         />
@@ -691,15 +693,14 @@ export default function HomePageClient() {
                           className={`xs:text-[10px] sm:text-xs md:text-sm font-medium 
                                      xs:px-2 xs:py-0.5
                                      sm:px-3 sm:py-1
-                                     rounded-full ${
-                                       project.status === 'Planning'
-                                         ? 'text-orange-600 bg-orange-100'
-                                         : project.status === 'Research'
-                                           ? 'text-purple-600 bg-purple-100'
-                                           : project.status === 'Design'
-                                             ? 'text-green-600 bg-green-100'
-                                             : 'text-gray-600 bg-gray-100'
-                                     }`}
+                                     rounded-full ${project.status === 'Planning'
+                              ? 'text-orange-600 bg-orange-100'
+                              : project.status === 'Research'
+                                ? 'text-purple-600 bg-purple-100'
+                                : project.status === 'Design'
+                                  ? 'text-green-600 bg-green-100'
+                                  : 'text-gray-600 bg-gray-100'
+                            }`}
                         >
                           {project.status}
                         </span>
@@ -1081,9 +1082,9 @@ export default function HomePageClient() {
                           <div className="font-semibold text-blue-900">
                             Email
                           </div>
-                          <div className="text-gray-700">
+                          <a href="mailto:info@rawatinnovations.com" className="text-blue-600 hover:underline">
                             info@rawatinnovations.com
-                          </div>
+                          </a>
                         </div>
                       </div>
                       <div className="flex items-center">
@@ -1282,12 +1283,13 @@ export default function HomePageClient() {
                   <li className="text-blue-100">CIN: U62011UT2025PTC019256</li>
                 </ul>
                 <div className="text-sm text-blue-200">
-                  <p>info@rawatinnovations.com</p>
                   <p>
-                    <a
-                      href="tel:+9101354093357"
-                      className="text-blue-600 hover:underline"
-                    >
+                    <a href="mailto:info@rawatinnovations.com" className="text-blue-200 hover:underline cursor-pointer">
+                      info@rawatinnovations.com
+                    </a>
+                  </p>
+                  <p>
+                    <a href="tel:+9101354093357" className="text-blue-200 hover:underline cursor-pointer">
                       +91-01354-093357
                     </a>
                   </p>
