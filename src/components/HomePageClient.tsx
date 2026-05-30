@@ -378,7 +378,7 @@ export default function HomePageClient() {
                     <div className="xs:w-16 xs:h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-blue-100">
                       <Image
                         src="/vineet-rawat.png"
-                        alt="Vineet Rawat - Founder & CEO of Rawat Innovations"
+                        alt="Vineet Rawat - Founder & CTO of Rawat Innovations"
                         width={80}
                         height={80}
                         className="w-full h-full object-cover"
@@ -393,14 +393,33 @@ export default function HomePageClient() {
                       Vineet Rawat
                     </h4>
                     <p className="text-gray-600 mb-2 xs:text-sm sm:text-base">
-                      Founder & CEO
+                      Founder & CTO
                     </p>
                     <p className="text-gray-500 xs:text-xs sm:text-sm leading-relaxed">
-                      Visionary leader with expertise in technology innovation
-                      and entrepreneurial ventures. Handling all aspects of
-                      technology innovation, from software development to
-                      business strategy.
+                      Self-taught full-stack engineer with 4+ years of
+                      experience building production systems from scratch.
+                      Previously built CapturePro — a Chrome extension that
+                      organically reached 11,000+ users. Now building Rawat
+                      Innovations solo: a bootstrapped, India-based technology
+                      company. Core expertise in backend infrastructure, system
+                      architecture, Python, Django, React, TypeScript, and
+                      AI/automation.
                     </p>
+                    <div className="mt-4 border-t border-gray-100 pt-4 text-left">
+                      <h5 className="font-semibold text-blue-900 xs:text-xs sm:text-sm mb-2">
+                        Track Record
+                      </h5>
+                      <ul className="space-y-1 xs:text-xs sm:text-xs text-gray-600">
+                        <li>
+                          CapturePro Chrome Extension — 11,000+ users (solo
+                          build)
+                        </li>
+                        <li>
+                          LocalBizLabs — active web development service for
+                          local businesses
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -410,9 +429,9 @@ export default function HomePageClient() {
                 <div className="grid grid-cols-2 md:grid-cols-4 xs:gap-4 sm:gap-6 md:gap-8 text-center">
                   {[
                     { number: '2025', label: 'Founded' },
-                    { number: '6', label: 'Industries' },
-                    { number: '∞', label: 'Limitless Potential' },
-                    { number: '1', label: 'Mission' },
+                    { number: '11K+', label: 'Users Reached' },
+                    { number: '4+', label: 'Years Building' },
+                    { number: '1', label: 'Product in Alpha' },
                   ].map((stat, idx) => (
                     <div key={idx}>
                       <div
@@ -623,21 +642,33 @@ export default function HomePageClient() {
                                md:px-6 md:py-3 md:text-base
                                rounded-full font-medium"
                 >
-                  Currently in Development Phase
+                  Now in closed alpha — early access coming soon.
                 </div>
               </div>
 
-              <div className="flex justify-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {[
+                  {
+                    title: 'CapturePro',
+                    category: 'Chrome Extension',
+                    description:
+                      'A productivity Chrome extension built solo that organically grew to 11,000+ users — demonstrating product-building capability and early traction without paid acquisition.',
+                    status: 'Launched',
+                    // Image needs to be added: /project-capturepro.png
+                    imageSrc: '/project-capturepro.png',
+                    imageAlt: 'CapturePro Chrome Extension',
+                    timeline: 'Launched',
+                    url: '#', // TODO: add Chrome Web Store URL
+                  },
                   {
                     title: 'Nearby Connect',
                     category: 'Social',
                     description:
                       'Location-based discovery social media app connecting people through shared experiences and local communities.',
-                    status: 'Development',
+                    status: 'Alpha',
                     imageSrc: '/project-nearby-connect.png',
                     imageAlt: 'Nearby Connect Social App',
-                    timeline: 'Q4 2025',
+                    timeline: 'In Alpha',
                     url: 'https://www.karmicinnovations.com/',
                   },
                 ].map((project, idx) => (
@@ -1309,7 +1340,7 @@ export default function HomePageClient() {
 
             <div className="border-t border-blue-800 pt-8 text-center">
               <p className="text-blue-200">
-                &copy; 2025 Rawat Innovations Pvt. Ltd. All rights reserved.
+                &copy; 2026 Rawat Innovations Pvt. Ltd. All rights reserved.
                 Building the future, one innovation at a time.
               </p>
             </div>
