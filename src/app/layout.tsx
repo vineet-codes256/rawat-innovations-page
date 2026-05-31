@@ -49,7 +49,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Rawat Innovations | Software Development, Web Design & NearbyConnect App | India',
+    title:
+      'Rawat Innovations | Software Development, Web Design & NearbyConnect App | India',
     description:
       'Rawat Innovations is a bootstrapped technology company building NearbyConnect — a hyperlocal social discovery app — alongside software development, web design for local businesses, and game design services. Founded by Vineet Rawat, self-taught full-stack engineer with 4+ years of experience.',
     url: 'https://rawatinnovations.com',
@@ -67,7 +68,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Rawat Innovations | Software Development, Web Design & NearbyConnect App | India',
+    title:
+      'Rawat Innovations | Software Development, Web Design & NearbyConnect App | India',
     description:
       'Rawat Innovations is a bootstrapped technology company building NearbyConnect — a hyperlocal social discovery app — alongside software development, web design for local businesses, and game design services. Founded by Vineet Rawat, self-taught full-stack engineer with 4+ years of experience.',
     images: ['/og-image.png'],

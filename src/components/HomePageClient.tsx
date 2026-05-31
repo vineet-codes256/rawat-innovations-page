@@ -398,7 +398,7 @@ export default function HomePageClient() {
                     <p className="text-gray-500 xs:text-xs sm:text-sm leading-relaxed">
                       Self-taught full-stack engineer with 4+ years of
                       experience building production systems from scratch.
-                      Previously built CapturePro — a Chrome extension that
+                      Previously built CapturePro, a Chrome extension that
                       organically reached 11,000+ users. Now building Rawat
                       Innovations solo: a bootstrapped, India-based technology
                       company. Core expertise in backend infrastructure, system
@@ -411,11 +411,11 @@ export default function HomePageClient() {
                       </h5>
                       <ul className="space-y-1 xs:text-xs sm:text-xs text-gray-600">
                         <li>
-                          CapturePro Chrome Extension — 11,000+ users (solo
+                          CapturePro Chrome Extension: 11,000+ users (solo
                           build)
                         </li>
                         <li>
-                          LocalBizLabs — active web development service for
+                          LocalBizLabs: active web development service for
                           local businesses
                         </li>
                       </ul>
@@ -642,7 +642,7 @@ export default function HomePageClient() {
                                md:px-6 md:py-3 md:text-base
                                rounded-full font-medium"
                 >
-                  Now in closed alpha — early access coming soon.
+                  Now in closed alpha, early access coming soon.
                 </div>
               </div>
 
@@ -652,7 +652,7 @@ export default function HomePageClient() {
                     title: 'CapturePro',
                     category: 'Chrome Extension',
                     description:
-                      'A productivity Chrome extension built solo that organically grew to 11,000+ users — demonstrating product-building capability and early traction without paid acquisition.',
+                      'A productivity Chrome extension built solo that organically grew to 11,000+ users, demonstrating product-building capability and early traction without paid acquisition.',
                     status: 'Launched',
                     // Image needs to be added: /project-capturepro.png
                     imageSrc: '/project-capturepro.png',
