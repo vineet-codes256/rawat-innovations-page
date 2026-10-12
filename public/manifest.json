@@ -1,16 +1,16 @@
 {
-  "name": "Rawat Innovations - Professional Software Solutions",
-  "short_name": "Rawat Innovations",
-  "description": "Emerging software development company developing web applications, mobile apps, and digital solutions for businesses worldwide.",
+  "name": "Rawat Innovations",
+  "short_name": "RIPL",
+  "description": "Bootstrapped software studio from Dehradun, Uttarakhand. Building NearbyConnect and CapturePro. Web development for local businesses via LocalBizLabs.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
   "orientation": "any",
   "scope": "/",
-  "lang": "en-US",
+  "lang": "en-IN",
   "dir": "ltr",
-  "categories": ["business", "productivity", "utilities"],
+  "categories": ["business", "productivity"],
   "prefer_related_applications": false,
   "display_override": [
     "window-controls-overlay",
@@ -32,46 +32,22 @@
       "purpose": "any maskable"
     }
   ],
-  "apple": {
-    "touch_icon": "/logo.png"
-  },
   "shortcuts": [
     {
       "name": "Contact Us",
       "short_name": "Contact",
       "description": "Get in touch with Rawat Innovations",
       "url": "/#contact",
-      "icons": [
-        {
-          "src": "/logo.png",
-          "sizes": "96x96"
-        }
-      ]
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
     },
     {
-      "name": "Our Services",
-      "short_name": "Services",
-      "description": "Explore our planned software development services",
-      "url": "/#services",
-      "icons": [
-        {
-          "src": "/logo.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Portfolio",
-      "short_name": "Portfolio",
-      "description": "View our vision for innovative projects",
-      "url": "/#portfolio",
-      "icons": [
-        {
-          "src": "/logo.png",
-          "sizes": "96x96"
-        }
-      ]
+      "name": "Our Products",
+      "short_name": "Products",
+      "description": "NearbyConnect and CapturePro",
+      "url": "/#products",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
     }
   ],
   "screenshots": []
 }
+
