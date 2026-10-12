@@ -1,96 +1,103 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+
+// ─── Contact form state type ────────────────────────────────────────────────
+type FormState = 'idle' | 'submitting' | 'success' | 'error';
+
+// ─── Reduced-motion helper ───────────────────────────────────────────────────
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 export default function HomePageClient() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [currentSection, setCurrentSection] = useState('home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Detect mobile device
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  // ─── Contact form ──────────────────────────────────────────────────────────
+  const [formState, setFormState] = useState<FormState>('idle');
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  // ─── Newsletter ────────────────────────────────────────────────────────────
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterError, setNewsletterError] = useState('');
+  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
 
-  // Smooth scroll with offset for fixed header - wrapped in useCallback
-  const scrollToSection = useCallback((sectionId: string) => {
-    if (typeof window === 'undefined' || typeof document === 'undefined')
-      return;
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const headerOffset = window.innerWidth < 768 ? 80 : 100;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition =
-        elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-      setCurrentSection(sectionId);
-    }
-  }, []);
-
-  // Touch gesture support for mobile with passive listeners
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-
-  // Optimize event listeners
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const handleTouchEnd = () => {
-      if (!touchStart || !touchEnd) return;
-
-      const distance = touchStart - touchEnd;
-      const isUpSwipe = distance > 50;
-      const isDownSwipe = distance < -50;
-
-      const sections = [
-        'home',
-        'about',
-        'services',
-        'portfolio',
-        'blog',
-        'contact',
-      ];
-      const currentIndex = sections.indexOf(currentSection);
-
-      if (isUpSwipe && currentIndex < sections.length - 1) {
-        scrollToSection(sections[currentIndex + 1]);
-      } else if (isDownSwipe && currentIndex > 0) {
-        scrollToSection(sections[currentIndex - 1]);
+  const scrollToSection = useCallback(
+    (sectionId: string, closeMobileMenu = false) => {
+      if (typeof document === 'undefined') return;
+      const el = document.getElementById(sectionId);
+      if (!el) return;
+      const headerOffset = window.innerWidth < 768 ? 80 : 96;
+      const top =
+        el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+      if (prefersReducedMotion()) {
+        window.scrollTo({ top });
+      } else {
+        window.scrollTo({ top, behavior: 'smooth' });
       }
+      if (closeMobileMenu) setMobileMenuOpen(false);
+    },
+    [],
+  );
 
-      // Reset touch states
-      setTouchStart(0);
-      setTouchEnd(0);
-    };
+  // ─── Contact form validation + submit ─────────────────────────────────────
+  const handleContactSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const fd = new FormData(e.currentTarget);
+      const name = (fd.get('name') as string).trim();
+      const email = (fd.get('email') as string).trim();
+      const topic = fd.get('topic') as string;
+      const message = (fd.get('message') as string).trim();
 
-    const options: AddEventListenerOptions = { passive: true };
-    const handlePassiveTouchStart = (e: TouchEvent) => {
-      setTouchStart(e.touches[0].clientY);
-    };
-    const handlePassiveTouchMove = (e: TouchEvent) => {
-      setTouchEnd(e.touches[0].clientY);
-    };
+      // Honeypot check
+      const honeypot = fd.get('_phone') as string;
+      if (honeypot) return; // bot detected — silently drop
 
-    document.addEventListener('touchstart', handlePassiveTouchStart, options);
-    document.addEventListener('touchmove', handlePassiveTouchMove, options);
-    document.addEventListener('touchend', handleTouchEnd);
+      const errors: Record<string, string> = {};
+      if (!name) errors.name = 'Name is required.';
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        errors.email = 'A valid email address is required.';
+      if (!topic) errors.topic = 'Please choose a topic.';
+      if (!message) errors.message = 'Message is required.';
 
-    return () => {
-      document.removeEventListener('touchstart', handlePassiveTouchStart);
-      document.removeEventListener('touchmove', handlePassiveTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [isMobile, touchStart, touchEnd, currentSection, scrollToSection]);
+      setFormErrors(errors);
+      if (Object.keys(errors).length > 0) return;
+
+      setFormState('submitting');
+
+      // No live endpoint yet — show success message. Replace with real fetch
+      // when an API route is wired up. {{NEEDS_FOUNDER: contact form endpoint}}
+      await new Promise((r) => setTimeout(r, 400));
+      setFormState('success');
+    },
+    [],
+  );
+
+  // ─── Newsletter validation + submit ───────────────────────────────────────
+  const handleNewsletterSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setNewsletterError('');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail.trim())) {
+        setNewsletterError('Please enter a valid email address.');
+        return;
+      }
+      // {{NEEDS_FOUNDER: newsletter endpoint}} — no live endpoint yet
+      setNewsletterSuccess(true);
+    },
+    [newsletterEmail],
+  );
+
+  // ─── Nav links ─────────────────────────────────────────────────────────────
+  const navLinks = [
+    { label: 'Products', id: 'products' },
+    { label: 'Services', id: 'services' },
+    { label: 'About', id: 'about' },
+    { label: 'Contact', id: 'contact' },
+  ];
 
   return (
     <>
@@ -103,197 +110,450 @@ export default function HomePageClient() {
       </a>
 
       <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 text-gray-900 font-sans">
-        {/* Header / Navigation */}
+        {/* ═══ HEADER ══════════════════════════════════════════════════════════ */}
         <header
-          className="fixed w-full sm:rounded-full sm:ml-[10%] sm:w-[80%] top-0 sm:top-4 z-50 bg-white/30 backdrop-blur-md border-b border-gray-300 shadow-lg scale-100 sm:scale-75 sm:origin-top animate-slideDown"
+          className="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm"
           role="banner"
         >
           <nav
-            className="mx-auto py-3 xs:py-3 sm:py-4"
+            className="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center justify-between"
             role="navigation"
             aria-label="Main navigation"
           >
-            <div className="flex items-center justify-between px-8">
-              {/* Logo */}
-              <div className="flex items-center space-x-2 xs:space-x-2 sm:space-x-3">
-                <Image
-                  src="/logo.png"
-                  alt="Rawat Innovations Logo"
-                  width={40}
-                  height={40}
-                  className="xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg bg-transparent object-contain"
-                  priority
-                  sizes="(max-width: 640px) 32px, 40px"
-                />
-                <span
-                  className="text-lg xs:text-base sm:text-xl font-bold text-blue-900 md:hidden"
-                  aria-label="Rawat Innovations Pvt Ltd"
-                >
-                  RIPL
-                </span>
-                <span
-                  className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900 hidden md:block cursor-default whitespace-nowrap"
-                  aria-label="Rawat Innovations Pvt Ltd"
-                >
-                  Rawat Innovations
-                </span>
-              </div>
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+              aria-label="Rawat Innovations — home"
+            >
+              <Image
+                src="/logo.png"
+                alt=""
+                width={36}
+                height={36}
+                className="rounded-lg object-contain"
+                priority
+                sizes="36px"
+                aria-hidden="true"
+              />
+              <span className="font-bold text-blue-900 text-lg hidden sm:inline">
+                Rawat Innovations
+              </span>
+              <span
+                className="font-bold text-blue-900 text-lg sm:hidden"
+                aria-hidden="true"
+              >
+                RIPL
+              </span>
+            </Link>
 
-              {/* CTA Button */}
+            {/* Desktop nav links */}
+            <ul
+              className="hidden md:flex items-center gap-1 list-none"
+              role="list"
+            >
+              {navLinks.map((link) => (
+                <li key={link.id}>
+                  <button
+                    onClick={() => scrollToSection(link.id)}
+                    className="px-3 py-2 text-gray-700 hover:text-blue-600 font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA + mobile menu toggle */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => scrollToSection('contact')}
-                className="bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                           xs:px-4 xs:py-2 xs:text-sm xs:min-w-[100px] xs:min-h-[44px]
-                           sm:px-5 sm:py-2.5 sm:text-base
-                           md:px-6 md:py-3
-                           lg:px-8 lg:py-3 lg:text-lg
-                           shadow-blue-300/50 hover:shadow-blue-400/50 shadow-lg"
+                className="bg-blue-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base"
                 aria-label="Get in touch with Rawat Innovations"
               >
-                <span className="xs:inline sm:hidden">Contact</span>
-                <span className="hidden sm:inline">Get in Touch</span>
+                Get in Touch
+              </button>
+
+              {/* Mobile hamburger */}
+              <button
+                className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu"
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                onClick={() => setMobileMenuOpen((o) => !o)}
+              >
+                <span aria-hidden="true" className="text-xl">
+                  {mobileMenuOpen ? '✕' : '☰'}
+                </span>
               </button>
             </div>
           </nav>
+
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <div
+              id="mobile-menu"
+              className="md:hidden bg-white border-t border-gray-200 px-4 py-3"
+            >
+              <ul className="flex flex-col gap-1 list-none" role="list">
+                {navLinks.map((link) => (
+                  <li key={link.id}>
+                    <button
+                      onClick={() => scrollToSection(link.id, true)}
+                      className="w-full text-left px-3 py-2.5 text-gray-700 hover:text-blue-600 font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
+                    >
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </header>
 
-        {/* Main Content */}
+        {/* ═══ MAIN CONTENT ════════════════════════════════════════════════════ */}
         <main id="main-content">
-          {/* Hero Section */}
+          {/* ── HERO ──────────────────────────────────────────────────────────── */}
           <section
             id="home"
-            className="relative overflow-hidden
-                       xs:pt-20 xs:pb-12 
-                       sm:pt-24 sm:pb-16 
-                       md:pt-28 md:pb-20
-                       lg:pt-32 lg:pb-24
-                       xl:pt-36 xl:pb-28"
+            className="pt-28 pb-16 sm:pt-32 sm:pb-20 relative overflow-hidden"
             aria-labelledby="hero-heading"
           >
-            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
-              <div className="text-center">
-                {/* Simplified background gradient - no animations */}
-                <div
-                  className="absolute inset-0 overflow-hidden hidden sm:block opacity-30"
-                  aria-hidden="true"
+            {/* Decorative blobs — hidden from assistive tech */}
+            <div
+              className="absolute inset-0 overflow-hidden hidden sm:block opacity-30 pointer-events-none"
+              aria-hidden="true"
+            >
+              <div className="absolute top-20 left-10 w-40 h-40 bg-blue-200/30 rounded-full blur-2xl" />
+              <div className="absolute bottom-20 right-10 w-48 h-48 bg-purple-200/20 rounded-full blur-2xl" />
+            </div>
+
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+              <h1
+                id="hero-heading"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-5 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight"
+              >
+                Simple, accessible software — built end to end.
+              </h1>
+              <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-3 max-w-2xl mx-auto">
+                Rawat Innovations is a bootstrapped studio in Dehradun,
+                Uttarakhand. Currently building NearbyConnect, a hyperlocal
+                social discovery app in closed alpha.
+              </p>
+              <p className="text-sm text-gray-500 mb-8 max-w-xl mx-auto">
+                Solo-founded by Vineet Rawat &middot; CIN: U62011UT2025PTC019256
+              </p>
+
+              <div
+                className="flex flex-col sm:flex-row gap-3 justify-center"
+                role="group"
+                aria-label="Primary actions"
+              >
+                {/* Primary CTA — {{NEEDS_FOUNDER: confirm final CTA target}} */}
+                <button
+                  onClick={() => scrollToSection('products')}
+                  className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[48px] text-base"
                 >
-                  <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl" />
-                  <div className="absolute bottom-20 right-10 w-40 h-40 bg-purple-200/20 rounded-full blur-xl" />
-                </div>
+                  See our products
+                </button>
+                <button
+                  onClick={() => scrollToSection('contact')}
+                  className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[48px] text-base"
+                >
+                  Get in Touch
+                </button>
+              </div>
+            </div>
+          </section>
 
-                <div className="relative z-10 max-w-4xl mx-auto">
-                  {/* Main Headline - Fully responsive */}
-                  <h1
-                    id="hero-heading"
-                    className="font-bold mb-4 sm:mb-6 mt-6 sm:mt-9 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight animate-fadeIn
-                               xs:text-2xl 
-                               sm:text-3xl 
-                               md:text-4xl 
-                               lg:text-5xl 
-                               xl:text-6xl 
-                               2xl:text-7xl
-                               3xl:text-8xl
-                               "
-                    tabIndex={-1}
-                  >
-                    Innovating Today for a<br className="hidden sm:block" />{' '}
-                    Smarter Tomorrow
-                  </h1>
+          {/* ── PRODUCTS ──────────────────────────────────────────────────────── */}
+          <section
+            id="products"
+            className="py-16 sm:py-20 bg-white"
+            aria-labelledby="products-heading"
+          >
+            <div className="max-w-5xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-12">
+                <h2
+                  id="products-heading"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 mb-4"
+                >
+                  Products
+                </h2>
+                <p className="text-gray-600 max-w-xl mx-auto">
+                  Two products built under RIPL, one launched and one in closed
+                  alpha.
+                </p>
+              </div>
 
-                  {/* Subheadline */}
-                  <p
-                    className="text-gray-600 mb-6 sm:mb-8 font-light mx-auto animate-fadeIn
-                                xs:text-sm xs:max-w-sm xs:px-2
-                                sm:text-base sm:max-w-xl
-                                md:text-lg md:max-w-2xl
-                                lg:text-xl lg:max-w-3xl
-                                xl:text-2xl
-                                2xl:text-2xl"
-                  >
-                    Rawat Innovations Pvt. Ltd. - Emerging multi-sector
-                    technology company developing innovative software solutions,
-                    gaming experiences, tourism technology, agritech
-                    innovations, and digital services to empower businesses
-                    worldwide.
-                  </p>
-
-                  {/* CTA Buttons */}
-                  <div
-                    className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 animate-fadeIn
-                               xs:px-4 sm:px-0"
-                    role="group"
-                    aria-label="Call to action buttons"
-                  >
-                    <button
-                      onClick={() => scrollToSection('portfolio')}
-                      className="w-full sm:w-auto bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                                 xs:px-6 xs:py-3 xs:text-sm xs:min-h-[48px]
-                                 sm:px-8 sm:py-4 sm:text-base
-                                 md:px-10 md:py-4
-                                 lg:px-12 lg:py-5 lg:text-lg"
-                      aria-label="Explore our vision and projects"
-                    >
-                      Explore Our Vision
-                    </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* NearbyConnect */}
+                <article className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                  <div className="h-44 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-6">
+                    <Image
+                      src="/project-nearby-connect.png"
+                      alt="NearbyConnect app icon"
+                      width={120}
+                      height={120}
+                      className="object-contain"
+                      loading="lazy"
+                      sizes="120px"
+                    />
+                  </div>
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                        Social App
+                      </span>
+                      <span className="text-xs font-medium text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+                        Closed Alpha
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">
+                      NearbyConnect
+                    </h3>
+                    <p className="text-gray-700 text-sm leading-relaxed mb-4 flex-1">
+                      A hyperlocal social discovery app that connects people
+                      through shared interests and nearby communities. Currently
+                      in closed alpha — early access coming soon.
+                    </p>
+                    {/* Waitlist placeholder — {{NEEDS_FOUNDER: waitlist URL or form destination}} */}
                     <button
                       onClick={() => scrollToSection('contact')}
-                      className="w-full sm:w-auto bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl border-2 border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                                 xs:px-6 xs:py-3 xs:text-sm xs:min-h-[48px]
-                                 sm:px-8 sm:py-4 sm:text-base
-                                 md:px-10 md:py-4
-                                 lg:px-12 lg:py-5 lg:text-lg"
-                      aria-label="Contact Rawat Innovations"
+                      className="mt-auto inline-flex items-center justify-center bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[44px]"
                     >
-                      Contact Us
+                      Request early access
                     </button>
                   </div>
+                </article>
 
-                  {/* Sector Icons - Responsive */}
-                  <div
-                    className="flex justify-center flex-wrap gap-3 sm:gap-4 md:gap-6 lg:gap-8 opacity-60 xs:px-2"
-                    role="list"
-                    aria-label="Technology sectors we serve"
-                  >
-                    {[
-                      {
-                        src: '/sector-software.png',
-                        alt: 'Software Development Services',
-                      },
-                      {
-                        src: '/sector-gaming.png',
-                        alt: 'Game Design and Development',
-                      },
-                      {
-                        src: '/sector-tourism.png',
-                        alt: 'Tourism Technology Solutions',
-                      },
-                      {
-                        src: '/sector-digital.png',
-                        alt: 'Digital Services and Consulting',
-                      },
-                      {
-                        src: '/sector-fashion.png',
-                        alt: 'Fashion and Apparel Technology',
-                      },
-                      {
-                        src: '/sector-agritech.png',
-                        alt: 'AgriTech Innovation Solutions',
-                      },
-                    ].map((icon, index) => (
-                      <div
-                        key={index}
-                        className={`xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 animate-dropIn-${index}`}
-                        role="listitem"
+                {/* CapturePro */}
+                <article className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                  <div className="h-44 bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-6">
+                    {/* {{NEEDS_FOUNDER: /project-capturepro.png — add screenshot or icon}} */}
+                    <div
+                      className="w-24 h-24 bg-purple-100 rounded-2xl flex items-center justify-center"
+                      aria-label="CapturePro icon placeholder"
+                    >
+                      <span
+                        className="text-4xl"
+                        role="img"
+                        aria-label="Camera"
                       >
-                        <Image
-                          src={icon.src}
-                          alt={icon.alt}
-                          width={56}
-                          height={56}
-                          className={`w-full h-full object-contain animate-wave-${index}`}
-                          loading="lazy"
-                          sizes="(max-width: 640px) 32px, (max-width: 768px) 40px, (max-width: 1024px) 48px, 56px"
-                        />
+                        📸
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-medium text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+                        Chrome Extension
+                      </span>
+                      <span className="text-xs font-medium text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                        Launched
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">
+                      CapturePro
+                    </h3>
+                    <p className="text-gray-700 text-sm leading-relaxed mb-4 flex-1">
+                      A productivity Chrome extension built solo. Reached 34,000+
+                      lifetime installs and 13,438 monthly active users (as of
+                      September 2026) without paid acquisition.
+                    </p>
+                    {/* {{NEEDS_FOUNDER: reconfirm current dashboard figures}} */}
+                    <div className="flex gap-4 text-center mb-4">
+                      <div className="flex-1 bg-purple-50 rounded-lg py-2">
+                        <div className="text-lg font-bold text-purple-700">
+                          34,000+
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          lifetime installs
+                        </div>
+                      </div>
+                      <div className="flex-1 bg-blue-50 rounded-lg py-2">
+                        <div className="text-lg font-bold text-blue-700">
+                          13,438
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          monthly active users
+                        </div>
+                      </div>
+                    </div>
+                    {/* {{NEEDS_FOUNDER: Chrome Web Store URL for CapturePro}} */}
+                    <p className="text-xs text-gray-500 italic mt-auto">
+                      Chrome Web Store link coming soon.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          {/* ── SERVICES ──────────────────────────────────────────────────────── */}
+          <section
+            id="services"
+            className="py-16 sm:py-20 bg-blue-50/60"
+            aria-labelledby="services-heading"
+          >
+            <div className="max-w-5xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-12">
+                <h2
+                  id="services-heading"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 mb-4"
+                >
+                  Services
+                </h2>
+                <p className="text-gray-600 max-w-xl mx-auto">
+                  Available to hire for focused, deliverable-based engagements.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* LocalBizLabs */}
+                <article className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+                  <div className="w-12 h-12 mb-4">
+                    <Image
+                      src="/service-localbizlabs.png"
+                      alt=""
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                      sizes="48px"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-blue-900 mb-2">
+                    LocalBizLabs
+                  </h3>
+                  <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                    Web development for local businesses: fast, accessible
+                    sites and small e-commerce builds. Clean code, no
+                    unnecessary plugins, handed over with documentation.
+                  </p>
+                  <button
+                    onClick={() => scrollToSection('contact')}
+                    className="text-blue-600 font-semibold text-sm hover:text-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded min-h-[44px] flex items-center"
+                  >
+                    Enquire about a website &rarr;
+                  </button>
+                </article>
+
+                {/* Custom Software */}
+                <article className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+                  <div className="w-12 h-12 mb-4">
+                    <Image
+                      src="/service-software.png"
+                      alt=""
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                      sizes="48px"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-blue-900 mb-2">
+                    Custom Software Development
+                  </h3>
+                  <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                    Contract engineering for backend-heavy work: APIs, system
+                    architecture, Django/Python, TypeScript, React. Available
+                    for short-term contracts and longer ongoing engagements.
+                  </p>
+                  <button
+                    onClick={() => scrollToSection('contact')}
+                    className="text-blue-600 font-semibold text-sm hover:text-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded min-h-[44px] flex items-center"
+                  >
+                    Discuss a project &rarr;
+                  </button>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          {/* ── ABOUT ─────────────────────────────────────────────────────────── */}
+          <section
+            id="about"
+            className="py-16 sm:py-20 bg-white"
+            aria-labelledby="about-heading"
+          >
+            <div className="max-w-5xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-12">
+                <h2
+                  id="about-heading"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 mb-4"
+                >
+                  About
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                {/* Founder card */}
+                <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center">
+                  <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-blue-100">
+                    <Image
+                      src="/vineet-rawat.png"
+                      alt="Vineet Rawat, Founder of Rawat Innovations"
+                      width={80}
+                      height={80}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      sizes="80px"
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-blue-900 mb-1">
+                    Vineet Rawat
+                  </h3>
+                  {/* {{NEEDS_FOUNDER: confirm preferred title}} */}
+                  <p className="text-gray-500 text-sm mb-3">
+                    Founder &amp; CTO
+                  </p>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    Self-taught full-stack engineer with 4+ years building
+                    production systems. Backend and architecture focus: Python,
+                    Django, TypeScript, React. Built CapturePro solo to 34,000+
+                    installs. Now running Rawat Innovations as a bootstrapped,
+                    solo studio in Uttarakhand.
+                  </p>
+                </div>
+
+                {/* Company narrative */}
+                <div className="space-y-6">
+                  <p className="text-gray-700 leading-relaxed">
+                    Rawat Innovations Pvt. Ltd. was incorporated in May 2025 in
+                    Uttarakhand, India. It is a solo, bootstrapped studio. No
+                    outside funding, no team yet.
+                  </p>
+                  <p className="text-gray-700 leading-relaxed">
+                    The focus is on building software that is simple to use and
+                    accessible to everyone. Accessibility is not treated as a
+                    checkbox — it is part of the design from the start. That
+                    matters here because a meaningful share of India&apos;s
+                    population navigates the web with assistive technology, and
+                    because usable software should be usable by all.
+                  </p>
+                  <p className="text-gray-700 leading-relaxed">
+                    NearbyConnect is the current primary build. LocalBizLabs
+                    and contract work fund the studio while NearbyConnect moves
+                    through alpha.
+                  </p>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                    {[
+                      { number: '2025', label: 'Founded' },
+                      { number: '4+', label: 'Years building' },
+                      { number: '34K+', label: 'CapturePro installs' },
+                    ].map((stat) => (
+                      <div key={stat.label} className="text-center">
+                        <div className="text-2xl font-bold text-blue-600 mb-1">
+                          {stat.number}
+                        </div>
+                        <div className="text-xs text-gray-500 leading-tight">
+                          {stat.label}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -302,991 +562,606 @@ export default function HomePageClient() {
             </div>
           </section>
 
-          {/* About Us Section */}
+          {/* ── CONTACT ───────────────────────────────────────────────────────── */}
           <section
-            id="about"
-            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-white"
+            id="contact"
+            className="py-16 sm:py-20 bg-blue-50/60"
+            aria-labelledby="contact-heading"
           >
-            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-              <div className="text-center xs:mb-8 sm:mb-12 md:mb-16">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-12">
                 <h2
-                  className="font-bold mb-4 sm:mb-6 text-blue-900
-                               xs:text-2xl 
-                               sm:text-3xl 
-                               md:text-4xl 
-                               lg:text-5xl
-                               xl:text-5xl"
+                  id="contact-heading"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-900 mb-4"
                 >
-                  About Rawat Innovations
+                  Get in Touch
                 </h2>
-                <p
-                  className="text-gray-600 mx-auto
-                              xs:text-sm xs:max-w-sm xs:px-2
-                              sm:text-base sm:max-w-xl
-                              md:text-lg md:max-w-2xl
-                              lg:text-xl lg:max-w-3xl"
-                >
-                  Founded in 2025, Rawat Innovations is an emerging technology
-                  company with ambitious plans in software development, gaming
-                  solutions, tourism technology, agritech innovations, and
-                  digital transformation services. We aim to bridge innovative
-                  technology with real-world business needs to create solutions
-                  that drive growth and empower communities across multiple
-                  industries.
+                <p className="text-gray-600 max-w-xl mx-auto">
+                  For project enquiries, early NearbyConnect access, or
+                  anything else — use the form below or email directly.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 xs:gap-6 sm:gap-8 md:gap-10 lg:gap-12 items-center xs:mb-8 sm:mb-12 md:mb-16">
-                {/* Mission & Vision */}
-                <div className="xs:space-y-4 sm:space-y-6">
-                  <div className="bg-white xs:p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h3
-                      className="font-bold mb-3 sm:mb-4 text-blue-900
-                                   xs:text-lg sm:text-xl md:text-2xl"
-                    >
-                      Our Mission
-                    </h3>
-                    <p className="text-gray-700 xs:text-sm sm:text-base leading-relaxed">
-                      To democratize innovation through advanced software
-                      development, gaming technology, tourism tech solutions,
-                      agritech innovations, and comprehensive digital services
-                      that solve real-world business challenges across multiple
-                      industries, driving sustainable growth and positive
-                      societal impact.
-                    </p>
-                  </div>
-                  <div className="bg-white xs:p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h3
-                      className="font-bold mb-3 sm:mb-4 text-blue-900
-                                   xs:text-lg sm:text-xl md:text-2xl"
-                    >
-                      Our Vision
-                    </h3>
-                    <p className="text-gray-700 xs:text-sm sm:text-base leading-relaxed">
-                      To become a key technology catalyst for digital
-                      transformation, creating innovative software products,
-                      gaming experiences, tourism technology solutions, agritech
-                      innovations, and digital services that redefine
-                      possibilities and empower businesses worldwide.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Leadership Cards */}
-                <div className="xs:space-y-4 sm:space-y-6">
-                  <div className="bg-white xs:p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-                    <div className="xs:w-16 xs:h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-blue-100">
-                      <Image
-                        src="/vineet-rawat.png"
-                        alt="Vineet Rawat - Founder & CTO of Rawat Innovations"
-                        width={80}
-                        height={80}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        sizes="(max-width: 640px) 64px, 80px"
-                      />
-                    </div>
-                    <h4
-                      className="font-bold text-blue-900 mb-2
-                                   xs:text-lg sm:text-xl"
-                    >
-                      Vineet Rawat
-                    </h4>
-                    <p className="text-gray-600 mb-2 xs:text-sm sm:text-base">
-                      Founder & CTO
-                    </p>
-                    <p className="text-gray-500 xs:text-xs sm:text-sm leading-relaxed">
-                      Self-taught full-stack engineer with 4+ years of
-                      experience building production systems from scratch.
-                      Previously built CapturePro, a Chrome extension that
-                      organically reached 11,000+ users. Now building Rawat
-                      Innovations solo: a bootstrapped, India-based technology
-                      company. Core expertise in backend infrastructure, system
-                      architecture, Python, Django, React, TypeScript, and
-                      AI/automation.
-                    </p>
-                    <div className="mt-4 border-t border-gray-100 pt-4 text-left">
-                      <h5 className="font-semibold text-blue-900 xs:text-xs sm:text-sm mb-2">
-                        Track Record
-                      </h5>
-                      <ul className="space-y-1 xs:text-xs sm:text-xs text-gray-600">
-                        <li>
-                          CapturePro Chrome Extension: 11,000+ users (solo
-                          build)
-                        </li>
-                        <li>
-                          LocalBizLabs: active web development service for
-                          local businesses
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="bg-white max-w-4xl mx-auto xs:p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100">
-                <div className="grid grid-cols-2 md:grid-cols-4 xs:gap-4 sm:gap-6 md:gap-8 text-center">
-                  {[
-                    { number: '2025', label: 'Founded' },
-                    { number: '11K+', label: 'Users Reached' },
-                    { number: '4+', label: 'Years Building' },
-                    { number: '1', label: 'Product in Alpha' },
-                  ].map((stat, idx) => (
-                    <div key={idx}>
-                      <div
-                        className="font-bold text-blue-600 mb-1 sm:mb-2
-                                      xs:text-2xl sm:text-3xl md:text-4xl"
-                      >
-                        {stat.number}
-                      </div>
-                      <div className="text-gray-600 xs:text-xs sm:text-sm">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Services / Sectors Section */}
-          <section
-            id="services"
-            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-blue-50/50"
-          >
-            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-              <div className="text-center xs:mb-8 sm:mb-12 md:mb-16">
-                <h2
-                  className="font-bold mb-4 sm:mb-6 text-blue-900
-                               xs:text-2xl 
-                               sm:text-3xl 
-                               md:text-4xl 
-                               lg:text-5xl
-                               xl:text-5xl"
-                >
-                  Our Sectors
-                </h2>
-                <p
-                  className="text-gray-600 mx-auto
-                              xs:text-sm xs:max-w-sm xs:px-2
-                              sm:text-base sm:max-w-xl
-                              md:text-lg md:max-w-2xl
-                              lg:text-xl lg:max-w-3xl"
-                >
-                  We operate across six dynamic sectors, each representing our
-                  commitment to innovation and excellence.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xs:gap-4 sm:gap-6 md:gap-8">
-                {[
-                  {
-                    title: 'LocalBizLabs',
-                    desc: 'Professional web development agency specializing in modern websites, e-commerce platforms, and digital solutions for local businesses.',
-                    iconSrc: '/service-localbizlabs.png',
-                    iconAlt: 'LocalBizLabs Web Development',
-                    color: 'blue',
-                    isNew: true,
-                    website: 'https://localbizlabs.com',
-                  },
-                  {
-                    title: 'Software Development',
-                    desc: 'Custom applications, SaaS platforms, and enterprise solutions built with modern technologies.',
-                    iconSrc: '/service-software.png',
-                    iconAlt: 'Software Development',
-                    color: 'purple',
-                    isNew: true,
-                    website: 'https://localbizlabs.com',
-                  },
-                  {
-                    title: 'Game Design',
-                    desc: 'Immersive gaming experiences for mobile, desktop, and console platforms.',
-                    iconSrc: '/service-winitstudios.png',
-                    iconAlt: 'Game Design',
-                    color: 'green',
-                    isNew: true,
-                    website: 'https://winitstudios.com',
-                  },
-                  {
-                    title: 'Tourism-Tech',
-                    desc: 'Smart travel solutions promoting culture and enhancing accessibility worldwide.',
-                    iconSrc: '/service-tourism.png',
-                    iconAlt: 'Tourism Technology',
-                    color: 'orange',
-                    isNew: false,
-                    website: 'Coming Soon',
-                  },
-                  {
-                    title: 'Digital Services',
-                    desc: 'Branding, consulting, content creation, and comprehensive digital transformation.',
-                    iconSrc: '/service-digital.png',
-                    iconAlt: 'Digital Services',
-                    color: 'indigo',
-                    isNew: false,
-                    website: 'Coming Soon',
-                  },
-                  {
-                    title: 'AgriTech Innovation',
-                    desc: 'IoT-powered agriculture solutions, AI tools, and rural empowerment initiatives.',
-                    iconSrc: '/service-agritech.png',
-                    iconAlt: 'AgriTech Innovation',
-                    color: 'emerald',
-                    isNew: false,
-                    website: 'Coming Soon',
-                  },
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white xs:p-4 sm:p-6 md:p-8 rounded-xl shadow-lg hover:shadow-xl 
-                               transition-shadow duration-200 group cursor-pointer border border-gray-100"
-                  >
-                    <div className="flex items-center justify-between mb-3 sm:mb-4">
-                      <div className="xs:w-10 xs:h-10 sm:w-12 sm:h-12">
-                        <Image
-                          src={item.iconSrc}
-                          alt={item.iconAlt}
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-contain"
-                          loading="lazy"
-                          sizes="(max-width: 640px) 40px, 48px"
-                        />
-                      </div>
-                      {item.isNew && (
-                        <span
-                          className="bg-blue-600 text-white xs:text-[10px] sm:text-xs 
-                                       xs:px-1.5 xs:py-0.5 sm:px-2 sm:py-1 rounded-full font-medium"
-                        >
-                          NEW
-                        </span>
-                      )}
-                      {item.website === 'Coming Soon' && (
-                        <span
-                          className="bg-yellow-500 text-white xs:text-[10px] sm:text-xs 
-                                       xs:px-1.5 xs:py-0.5 sm:px-2 sm:py-1 rounded-full font-medium"
-                        >
-                          Coming Soon
-                        </span>
-                      )}
-                    </div>
-                    <h3
-                      className="font-bold mb-3 sm:mb-4 text-blue-900 
-                                   group-hover:text-blue-600 transition-colors
-                                   xs:text-lg sm:text-xl md:text-2xl"
-                    >
-                      {item.title}
-                    </h3>
-                    <p
-                      className="text-gray-700 leading-relaxed mb-3 sm:mb-4
-                                  xs:text-xs sm:text-sm md:text-base"
-                    >
-                      {item.desc}
-                    </p>
-                    <button
-                      className="text-blue-600 font-semibold hover:text-blue-800 
-                                 transition-colors xs:text-xs sm:text-sm md:text-base
-                                 min-h-[44px] flex items-center"
-                      onClick={() => {
-                        if (typeof window !== 'undefined') {
-                          window.open(
-                            item.website,
-                            '_blank',
-                            'noopener,noreferrer'
-                          );
-                        }
-                      }}
-                    >
-                      Learn More
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Portfolio / Projects Section */}
-          <section
-            id="portfolio"
-            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-white"
-          >
-            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-              <div className="text-center xs:mb-8 sm:mb-12 md:mb-16">
-                <h2
-                  className="font-bold mb-4 sm:mb-6 text-blue-900
-                               xs:text-2xl 
-                               sm:text-3xl 
-                               md:text-4xl 
-                               lg:text-5xl
-                               xl:text-5xl"
-                >
-                  Our Vision
-                </h2>
-                <p
-                  className="text-gray-600 mx-auto mb-4 sm:mb-6 md:mb-8
-                              xs:text-sm xs:max-w-sm xs:px-2
-                              sm:text-base sm:max-w-xl
-                              md:text-lg md:max-w-2xl
-                              lg:text-xl lg:max-w-3xl"
-                >
-                  Bold ideas and moonshot projects shaping the future.
-                  We&apos;re currently building the foundation for
-                  groundbreaking innovations.
-                </p>
-
-                {/* Status Indicator */}
-                <div
-                  className="inline-flex items-center bg-blue-100 text-blue-800 
-                               xs:px-3 xs:py-2 xs:text-xs
-                               sm:px-4 sm:py-2 sm:text-sm
-                               md:px-6 md:py-3 md:text-base
-                               rounded-full font-medium"
-                >
-                  Now in closed alpha, early access coming soon.
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                {[
-                  {
-                    title: 'CapturePro',
-                    category: 'Chrome Extension',
-                    description:
-                      'A productivity Chrome extension built solo that organically grew to 11,000+ users, demonstrating product-building capability and early traction without paid acquisition.',
-                    status: 'Launched',
-                    // Image needs to be added: /project-capturepro.png
-                    imageSrc: '/project-capturepro.png',
-                    imageAlt: 'CapturePro Chrome Extension',
-                    timeline: 'Launched',
-                    url: '#', // TODO: add Chrome Web Store URL
-                  },
-                  {
-                    title: 'Nearby Connect',
-                    category: 'Social',
-                    description:
-                      'Location-based discovery social media app connecting people through shared experiences and local communities.',
-                    status: 'Alpha',
-                    imageSrc: '/project-nearby-connect.png',
-                    imageAlt: 'Nearby Connect Social App',
-                    timeline: 'In Alpha',
-                    url: 'https://www.karmicinnovations.com/',
-                  },
-                ].map((project, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 
-                               group cursor-pointer border border-gray-100 overflow-hidden"
-                    onClick={() => {
-                      if (project.url && typeof window !== 'undefined') {
-                        window.open(
-                          project.url,
-                          '_blank',
-                          'noopener,noreferrer'
-                        );
-                      }
-                    }}
-                  >
-                    <div
-                      className="xs:h-36 sm:h-40 md:h-48 bg-gradient-to-br from-blue-50 to-purple-50 
-                                    flex items-center justify-center relative"
-                    >
-                      <Image
-                        src={project.imageSrc}
-                        alt={project.imageAlt}
-                        width={192}
-                        height={192}
-                        className="w-full h-full object-contain xs:p-4 sm:p-6"
-                        loading="lazy"
-                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, 25vw"
-                      />
-                      <div
-                        className="absolute xs:top-2 xs:right-2 sm:top-4 sm:right-4 
-                                     bg-white/90 backdrop-blur-sm 
-                                     xs:px-2 xs:py-0.5 xs:text-[10px]
-                                     sm:px-3 sm:py-1 sm:text-xs
-                                     rounded-full font-medium text-blue-600"
-                      >
-                        {project.timeline}
-                      </div>
-                    </div>
-                    <div className="xs:p-3 sm:p-4 md:p-6">
-                      <div className="flex items-center justify-between mb-2 sm:mb-3">
-                        <span
-                          className="xs:text-[10px] sm:text-xs md:text-sm font-medium 
-                                       text-blue-600 bg-blue-100 
-                                       xs:px-2 xs:py-0.5
-                                       sm:px-3 sm:py-1
-                                       rounded-full"
-                        >
-                          {project.category}
-                        </span>
-                        <span
-                          className={`xs:text-[10px] sm:text-xs md:text-sm font-medium 
-                                     xs:px-2 xs:py-0.5
-                                     sm:px-3 sm:py-1
-                                     rounded-full ${
-                                       project.status === 'Planning'
-                                         ? 'text-orange-600 bg-orange-100'
-                                         : project.status === 'Research'
-                                           ? 'text-purple-600 bg-purple-100'
-                                           : project.status === 'Design'
-                                             ? 'text-green-600 bg-green-100'
-                                             : 'text-gray-600 bg-gray-100'
-                                     }`}
-                        >
-                          {project.status}
-                        </span>
-                      </div>
-                      <h3
-                        className="font-bold mb-2 sm:mb-3 text-blue-900 
-                                     group-hover:text-blue-600 transition-colors
-                                     xs:text-sm sm:text-base md:text-lg lg:text-xl"
-                      >
-                        {project.title}
-                      </h3>
-                      <p
-                        className="text-gray-700 leading-relaxed
-                                    xs:text-xs sm:text-sm md:text-base"
-                      >
-                        {project.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Newsletter Signup */}
-          <section
-            id="newsletter"
-            className="xs:py-12 sm:py-16 md:py-20 lg:py-24 bg-blue-50/50"
-          >
-            <div className="container mx-auto xs:px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-              <div
-                className="bg-white max-w-2xl mx-auto xs:p-4 sm:p-6 md:p-8 
-                              rounded-2xl shadow-lg border border-gray-100 text-center"
-              >
-                <h3
-                  className="font-bold xs:mb-2 sm:mb-3 md:mb-4 text-blue-900
-                               xs:text-lg sm:text-xl md:text-2xl"
-                >
-                  Stay Updated
-                </h3>
-                <p
-                  className="text-gray-700 xs:mb-3 sm:mb-4 md:mb-6
-                              xs:text-xs sm:text-sm md:text-base"
-                >
-                  Subscribe to our newsletter for the latest insights on
-                  technology innovation and industry trends.
-                </p>
-                <div className="flex flex-col sm:flex-row xs:gap-2 sm:gap-3 md:gap-4">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="flex-1 xs:px-3 xs:py-2 xs:text-xs
-                               sm:px-4 sm:py-3 sm:text-sm
-                               md:text-base
-                               rounded-lg border border-gray-300 
-                               focus:outline-none focus:ring-2 focus:ring-blue-500
-                               min-h-[44px]"
-                  />
-                  <button
-                    className="bg-blue-600 text-white 
-                               xs:px-4 xs:py-2 xs:text-xs
-                               sm:px-5 sm:py-3 sm:text-sm
-                               md:px-6 md:text-base
-                               rounded-lg font-semibold hover:bg-blue-700 
-                               transition-all duration-300 shadow-lg hover:shadow-xl
-                               min-h-[44px]"
-                  >
-                    Subscribe
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Future Opportunities */}
-          <section id="careers" className="py-20 bg-white">
-            <div className="container mx-auto px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
-              >
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-blue-900">
-                  Future Opportunities
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                  Currently a solo operation led by Vineet Rawat. Future
-                  opportunities will be posted as we grow.
-                </p>
-              </motion.div>
-
-              <div className="max-w-4xl mx-auto">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-2xl border border-blue-100 text-center"
-                >
-                  <h3 className="text-2xl font-bold mb-4 text-blue-900">
-                    Building Something Special
-                  </h3>
-                  <p className="text-gray-700 mb-6">
-                    Rawat Innovations is currently a one-person operation where
-                    Vineet Rawat handles all aspects of the business. As we grow
-                    and expand our moonshot projects, we&apos;ll be looking for
-                    passionate innovators to join our journey.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                      <h4 className="text-lg font-bold mb-3 text-blue-900">
-                        What We&apos;re Looking For
-                      </h4>
-                      <ul className="text-left space-y-2 text-gray-700">
-                        <li className="flex items-center">
-                          <div className="w-4 h-4 mr-2">
-                            <Image
-                              src="/check-icon.png"
-                              alt="Check"
-                              width={16}
-                              height={16}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          Passionate developers
-                        </li>
-                        <li className="flex items-center">
-                          <div className="w-4 h-4 mr-2">
-                            <Image
-                              src="/check-icon.png"
-                              alt="Check"
-                              width={16}
-                              height={16}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          Creative designers
-                        </li>
-                        <li className="flex items-center">
-                          <div className="w-4 h-4 mr-2">
-                            <Image
-                              src="/check-icon.png"
-                              alt="Check"
-                              width={16}
-                              height={16}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          Strategic thinkers
-                        </li>
-                        <li className="flex items-center">
-                          <div className="w-4 h-4 mr-2">
-                            <Image
-                              src="/check-icon.png"
-                              alt="Check"
-                              width={16}
-                              height={16}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          Innovation drivers
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                      <h4 className="text-lg font-bold mb-3 text-blue-900">
-                        Stay Connected
-                      </h4>
-                      <p className="text-gray-700 mb-4">
-                        Follow our journey and be the first to know when
-                        opportunities arise.
-                      </p>
-                      <div className="flex justify-center space-x-4">
-                        {[
-                          {
-                            icon: '/social-linkedin.png',
-                            url: 'https://www.linkedin.com/company/rawat-innovations-pvt-ltd',
-                          },
-                          {
-                            icon: '/social-twitter.png',
-                            url: 'https://x.com/ripl_in',
-                          },
-                          {
-                            icon: '/social-instagram.png',
-                            url: 'https://www.instagram.com/rawatinnovations',
-                          },
-                        ].map((social, idx) => (
-                          <motion.a
-                            key={idx}
-                            href={social.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-lg flex items-center justify-center text-white hover:shadow-lg transition-shadow backdrop-blur-sm bg-white/20"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                          >
-                            <Image
-                              src={social.icon}
-                              alt="Social Media"
-                              width={40}
-                              height={40}
-                              className="w-10 h-10 rounded-lg object-contain"
-                            />
-                          </motion.a>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </section>
-
-          {/* Contact Section */}
-          <section id="contact" className="py-20 bg-blue-50/50">
-            <div className="container mx-auto px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
-              >
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-blue-900">
-                  Contact Us
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Ready to start your innovation journey? Get in touch with
-                  Vineet Rawat.
-                </p>
-              </motion.div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                {/* Contact Form */}
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100"
-                >
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* Form */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
                   <h3
-                    id="contact-form-heading"
-                    className="text-2xl font-bold mb-6 text-blue-900"
+                    id="contact-form-label"
+                    className="text-xl font-bold text-blue-900 mb-6"
                   >
-                    Send us a Message
+                    Send a message
                   </h3>
-                  <form
-                    className="space-y-6"
-                    role="form"
-                    aria-labelledby="contact-form-heading"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label
-                          htmlFor="contact-name"
-                          className="block text-sm font-medium text-gray-700 mb-2"
-                        >
-                          Name{' '}
-                          <span className="text-red-500" aria-label="required">
-                            *
-                          </span>
-                        </label>
-                        <input
-                          id="contact-name"
-                          type="text"
-                          name="name"
-                          required
-                          aria-required="true"
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Your full name"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="contact-email"
-                          className="block text-sm font-medium text-gray-700 mb-2"
-                        >
-                          Email{' '}
-                          <span className="text-red-500" aria-label="required">
-                            *
-                          </span>
-                        </label>
-                        <input
-                          id="contact-email"
-                          type="email"
-                          name="email"
-                          required
-                          aria-required="true"
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="your@email.com"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="contact-sector"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Sector of Interest{' '}
-                        <span className="text-red-500" aria-label="required">
-                          *
-                        </span>
-                      </label>
-                      <select
-                        id="contact-sector"
-                        name="sector"
-                        required
-                        aria-required="true"
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="">Select a sector</option>
-                        <option value="software">Software Development</option>
-                        <option value="gaming">Game Design</option>
-                        <option value="tourism">Tourism-Tech</option>
-                        <option value="digital">Digital Services</option>
-                        <option value="merch">Merch & Apparel</option>
-                        <option value="agritech">AgriTech Innovation</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="contact-message"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Message{' '}
-                        <span className="text-red-500" aria-label="required">
-                          *
-                        </span>
-                      </label>
-                      <textarea
-                        id="contact-message"
-                        name="message"
-                        rows={4}
-                        required
-                        aria-required="true"
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
-                        placeholder="Tell us about your project..."
-                      />
-                    </div>
-                    <motion.button
-                      type="submit"
-                      className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+
+                  {formState === 'success' ? (
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      className="text-center py-10"
                     >
-                      Send Message
-                    </motion.button>
-                  </form>
-                </motion.div>
-
-                {/* Contact Info */}
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="space-y-6"
-                >
-                  {/* Contact Information */}
-                  <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h3 className="text-xl font-bold mb-4 text-blue-900">
-                      Get in Touch
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                          <Image
-                            src="/contact-email.png"
-                            alt="Email"
-                            width={20}
-                            height={20}
-                            className="w-8 h-8 object-contain"
-                          />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-blue-900">
-                            Email
-                          </div>
-                          <a
-                            href="mailto:info@rawatinnovations.com"
-                            className="text-blue-600 hover:underline"
-                          >
-                            info@rawatinnovations.com
-                          </a>
-                        </div>
+                      <div className="text-4xl mb-3" aria-hidden="true">
+                        ✅
                       </div>
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                          <Image
-                            src="/contact-phone.png"
-                            alt="Phone"
-                            width={20}
-                            height={20}
-                            className="w-8 h-8 object-contain"
-                          />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-blue-900">
-                            Phone
-                          </div>
-                          <a
-                            href="tel:+9101354093357"
-                            className="text-blue-600 hover:underline"
-                          >
-                            +91-01354-093357
-                          </a>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                          <Image
-                            src="/contact-location.png"
-                            alt="Location"
-                            width={20}
-                            height={20}
-                            className="w-8 h-8 object-contain"
-                          />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-blue-900">
-                            Address
-                          </div>
-                          <div className="text-gray-700">
-                            Uttarakhand, India
-                          </div>
-                        </div>
-                      </div>
+                      <p className="text-gray-800 font-semibold">
+                        Message received. We&apos;ll get back to you at the
+                        email you provided.
+                      </p>
                     </div>
-                  </div>
+                  ) : (
+                    <form
+                      onSubmit={handleContactSubmit}
+                      aria-labelledby="contact-form-label"
+                      noValidate
+                    >
+                      {/* Honeypot — hidden from sighted users, traps bots */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: '-9999px',
+                          opacity: 0,
+                          pointerEvents: 'none',
+                        }}
+                        aria-hidden="true"
+                      >
+                        <label htmlFor="f-phone">Phone (leave blank)</label>
+                        <input
+                          id="f-phone"
+                          type="text"
+                          name="_phone"
+                          tabIndex={-1}
+                          autoComplete="off"
+                        />
+                      </div>
 
-                  {/* Social Media */}
-                  <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h3 className="text-xl font-bold mb-4 text-blue-900">
-                      Follow Us
-                    </h3>
-                    <div className="flex space-x-4">
-                      {[
-                        {
-                          icon: '/social-linkedin.png',
-                          label: 'LinkedIn',
-                          url: 'https://www.linkedin.com/company/rawat-innovations-pvt-ltd',
-                        },
-                        {
-                          icon: '/social-twitter.png',
-                          label: 'Twitter',
-                          url: 'https://x.com/ripl_in',
-                        },
-                        {
-                          icon: '/social-instagram.png',
-                          label: 'Instagram',
-                          url: 'https://www.instagram.com/rawatinnovations',
-                        },
-                      ].map((social, idx) => (
-                        <motion.a
-                          key={idx}
-                          href={social.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-9 h-9 rounded-lg flex items-center justify-center text-white hover:shadow-lg transition-shadow backdrop-blur-sm bg-white/20"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
+                      <div
+                        aria-live="assertive"
+                        aria-atomic="true"
+                        className="sr-only"
+                      >
+                        {Object.keys(formErrors).length > 0 &&
+                          'Please fix the errors below before submitting.'}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        {/* Name */}
+                        <div>
+                          <label
+                            htmlFor="f-name"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Name{' '}
+                            <span
+                              className="text-red-600"
+                              aria-label="required"
+                            >
+                              *
+                            </span>
+                          </label>
+                          <input
+                            id="f-name"
+                            type="text"
+                            name="name"
+                            required
+                            aria-required="true"
+                            aria-describedby={
+                              formErrors.name ? 'f-name-error' : undefined
+                            }
+                            aria-invalid={formErrors.name ? 'true' : undefined}
+                            className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] ${formErrors.name ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="Your name"
+                            autoComplete="name"
+                          />
+                          {formErrors.name && (
+                            <p
+                              id="f-name-error"
+                              className="text-red-600 text-xs mt-1"
+                              role="alert"
+                            >
+                              {formErrors.name}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                          <label
+                            htmlFor="f-email"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
+                            Email{' '}
+                            <span
+                              className="text-red-600"
+                              aria-label="required"
+                            >
+                              *
+                            </span>
+                          </label>
+                          <input
+                            id="f-email"
+                            type="email"
+                            name="email"
+                            required
+                            aria-required="true"
+                            aria-describedby={
+                              formErrors.email ? 'f-email-error' : undefined
+                            }
+                            aria-invalid={
+                              formErrors.email ? 'true' : undefined
+                            }
+                            className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="your@email.com"
+                            autoComplete="email"
+                          />
+                          {formErrors.email && (
+                            <p
+                              id="f-email-error"
+                              className="text-red-600 text-xs mt-1"
+                              role="alert"
+                            >
+                              {formErrors.email}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Topic */}
+                      <div className="mb-4">
+                        <label
+                          htmlFor="f-topic"
+                          className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                          <Image
-                            src={social.icon}
-                            alt={social.label}
-                            width={20}
-                            height={20}
-                            className="w-9 h-9 object-contain rounded-lg"
-                          />
-                        </motion.a>
-                      ))}
+                          Topic{' '}
+                          <span
+                            className="text-red-600"
+                            aria-label="required"
+                          >
+                            *
+                          </span>
+                        </label>
+                        <select
+                          id="f-topic"
+                          name="topic"
+                          required
+                          aria-required="true"
+                          aria-describedby={
+                            formErrors.topic ? 'f-topic-error' : undefined
+                          }
+                          aria-invalid={
+                            formErrors.topic ? 'true' : undefined
+                          }
+                          className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] ${formErrors.topic ? 'border-red-500' : 'border-gray-300'}`}
+                        >
+                          <option value="">Select a topic</option>
+                          <option value="nearbconnect">
+                            NearbyConnect early access
+                          </option>
+                          <option value="localbizlabs">
+                            LocalBizLabs — website project
+                          </option>
+                          <option value="software">
+                            Custom software development
+                          </option>
+                          <option value="other">Other</option>
+                        </select>
+                        {formErrors.topic && (
+                          <p
+                            id="f-topic-error"
+                            className="text-red-600 text-xs mt-1"
+                            role="alert"
+                          >
+                            {formErrors.topic}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Message */}
+                      <div className="mb-4">
+                        <label
+                          htmlFor="f-message"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Message{' '}
+                          <span
+                            className="text-red-600"
+                            aria-label="required"
+                          >
+                            *
+                          </span>
+                        </label>
+                        <textarea
+                          id="f-message"
+                          name="message"
+                          rows={4}
+                          required
+                          aria-required="true"
+                          aria-describedby={
+                            formErrors.message ? 'f-message-error' : undefined
+                          }
+                          aria-invalid={
+                            formErrors.message ? 'true' : undefined
+                          }
+                          className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical ${formErrors.message ? 'border-red-500' : 'border-gray-300'}`}
+                          placeholder="What can we help with?"
+                        />
+                        {formErrors.message && (
+                          <p
+                            id="f-message-error"
+                            className="text-red-600 text-xs mt-1"
+                            role="alert"
+                          >
+                            {formErrors.message}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Consent */}
+                      <p className="text-xs text-gray-500 mb-4">
+                        By sending this message you agree that we may store
+                        your name and email to reply to your enquiry. See our{' '}
+                        <Link
+                          href="/privacy"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
+
+                      <button
+                        type="submit"
+                        disabled={formState === 'submitting'}
+                        className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[48px] disabled:opacity-60 disabled:cursor-not-allowed"
+                        aria-live="polite"
+                      >
+                        {formState === 'submitting'
+                          ? 'Sending...'
+                          : 'Send message'}
+                      </button>
+                    </form>
+                  )}
+                </div>
+
+                {/* Contact info + Social */}
+                <div className="space-y-6">
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-bold text-blue-900 mb-4">
+                      Direct contact
+                    </h3>
+                    <dl className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <Image
+                          src="/contact-email.png"
+                          alt=""
+                          width={20}
+                          height={20}
+                          className="w-5 h-5 object-contain mt-0.5 flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                        <div>
+                          <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Email
+                          </dt>
+                          <dd>
+                            <a
+                              href="mailto:info@rawatinnovations.com"
+                              className="text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                            >
+                              info@rawatinnovations.com
+                            </a>
+                          </dd>
+                        </div>
+                      </div>
+
+                      {/* Phone — {{NEEDS_FOUNDER: confirm correct number and whether it is staffed}} */}
+                      <div className="flex items-start gap-3">
+                        <Image
+                          src="/contact-phone.png"
+                          alt=""
+                          width={20}
+                          height={20}
+                          className="w-5 h-5 object-contain mt-0.5 flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                        <div>
+                          <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Phone
+                          </dt>
+                          <dd>
+                            {/* tel: value needs confirmation — see F6 */}
+                            <a
+                              href="tel:+911354093357"
+                              className="text-blue-600 hover:underline text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                            >
+                              +91 1354 093357
+                            </a>
+                            <span className="text-xs text-gray-400 block mt-0.5">
+                              {/* NEEDS_FOUNDER: confirm this number is correct */}
+                              Number needs founder confirmation before launch.
+                            </span>
+                          </dd>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Image
+                          src="/contact-location.png"
+                          alt=""
+                          width={20}
+                          height={20}
+                          className="w-5 h-5 object-contain mt-0.5 flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                        <div>
+                          <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Location
+                          </dt>
+                          {/* {{NEEDS_FOUNDER: confirm address disclosure level}} */}
+                          <dd className="text-sm text-gray-700">
+                            Dehradun, Uttarakhand, India
+                          </dd>
+                        </div>
+                      </div>
+                    </dl>
+                  </div>
+
+                  {/* Social */}
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-bold text-blue-900 mb-4">
+                      Follow our work
+                    </h3>
+                    <div className="flex gap-3">
+                      <a
+                        href="https://www.linkedin.com/company/rawat-innovations-pvt-ltd"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Rawat Innovations on LinkedIn (opens in new tab)"
+                        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] min-w-[44px]"
+                      >
+                        <Image
+                          src="/social-linkedin.png"
+                          alt=""
+                          width={28}
+                          height={28}
+                          className="object-contain"
+                          aria-hidden="true"
+                        />
+                      </a>
+                      <a
+                        href="https://x.com/ripl_in"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Rawat Innovations on X, formerly Twitter (opens in new tab)"
+                        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] min-w-[44px]"
+                      >
+                        <Image
+                          src="/social-twitter.png"
+                          alt=""
+                          width={28}
+                          height={28}
+                          className="object-contain"
+                          aria-hidden="true"
+                        />
+                      </a>
+                      <a
+                        href="https://www.instagram.com/rawatinnovations"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Rawat Innovations on Instagram (opens in new tab)"
+                        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] min-w-[44px]"
+                      >
+                        <Image
+                          src="/social-instagram.png"
+                          alt=""
+                          width={28}
+                          height={28}
+                          className="object-contain"
+                          aria-hidden="true"
+                        />
+                      </a>
                     </div>
                   </div>
-                </motion.div>
+
+                  {/* Newsletter */}
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-bold text-blue-900 mb-2">
+                      Stay updated
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Get occasional updates on NearbyConnect and what
+                      we&apos;re building.
+                    </p>
+                    {newsletterSuccess ? (
+                      <p
+                        role="status"
+                        aria-live="polite"
+                        className="text-green-700 text-sm font-semibold"
+                      >
+                        Thanks! We&apos;ll be in touch.
+                      </p>
+                    ) : (
+                      <form
+                        onSubmit={handleNewsletterSubmit}
+                        aria-label="Newsletter signup"
+                        noValidate
+                      >
+                        <label
+                          htmlFor="nl-email"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Email address{' '}
+                          <span
+                            className="text-red-600"
+                            aria-label="required"
+                          >
+                            *
+                          </span>
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            id="nl-email"
+                            type="email"
+                            name="nl-email"
+                            required
+                            aria-required="true"
+                            aria-describedby={
+                              newsletterError ? 'nl-error' : undefined
+                            }
+                            aria-invalid={newsletterError ? 'true' : undefined}
+                            value={newsletterEmail}
+                            onChange={(e) =>
+                              setNewsletterEmail(e.target.value)
+                            }
+                            placeholder="your@email.com"
+                            className={`flex-1 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] ${newsletterError ? 'border-red-500' : 'border-gray-300'}`}
+                            autoComplete="email"
+                          />
+                          <button
+                            type="submit"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] whitespace-nowrap"
+                          >
+                            Subscribe
+                          </button>
+                        </div>
+                        {newsletterError && (
+                          <p
+                            id="nl-error"
+                            className="text-red-600 text-xs mt-1"
+                            role="alert"
+                          >
+                            {newsletterError}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-400 mt-2">
+                          No spam. Unsubscribe at any time. See our{' '}
+                          <Link
+                            href="/privacy"
+                            className="text-blue-600 hover:underline"
+                          >
+                            Privacy Policy
+                          </Link>
+                          .
+                        </p>
+                      </form>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </section>
         </main>
 
-        {/* Footer */}
-        <footer className="bg-blue-900 text-white py-12">
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-              {/* Company Info */}
-              <div className="md:col-span-2">
-                <div className="flex items-center space-x-3 mb-4 bg-white/10 p-2 rounded-lg h-10 w-max">
+        {/* ═══ FOOTER ══════════════════════════════════════════════════════════ */}
+        <footer
+          className="bg-blue-900 text-white py-10"
+          role="contentinfo"
+        >
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              {/* Brand */}
+              <div className="md:col-span-1">
+                <div className="flex items-center gap-2 mb-3">
                   <Image
                     src="/logo.png"
-                    alt="Rawat Innovations Logo"
-                    width={32}
-                    height={32}
+                    alt=""
+                    width={28}
+                    height={28}
                     className="rounded-lg"
+                    aria-hidden="true"
                   />
-                  <span className="text-xl font-bold">Rawat Innovations</span>
+                  <span className="font-bold text-lg">Rawat Innovations</span>
                 </div>
-                <p className="text-blue-100 mb-4 max-w-md">
-                  Building moonshot products that drive innovation across
-                  software, gaming, tourism, agritech, apparel, and digital
-                  services.
+                <p className="text-blue-200 text-sm leading-relaxed mb-4">
+                  Bootstrapped software studio. Building NearbyConnect and
+                  providing web and engineering services from Dehradun,
+                  Uttarakhand.
                 </p>
-                <div className="flex space-x-4">
-                  {[
-                    {
-                      icon: '/social-linkedin.png',
-                      url: 'https://www.linkedin.com/company/rawat-innovations-pvt-ltd',
-                    },
-                    {
-                      icon: '/social-twitter.png',
-                      url: 'https://x.com/ripl_in',
-                    },
-                    {
-                      icon: '/social-instagram.png',
-                      url: 'https://www.instagram.com/rawatinnovations',
-                    },
-                  ].map((social, idx) => (
-                    <motion.a
-                      key={idx}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-8 h-8 flex items-center justify-center transition-colors"
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Image
-                        src={social.icon}
-                        alt="Social Media"
-                        width={16}
-                        height={16}
-                        className="w-8 h-8 object-contain"
-                      />
-                    </motion.a>
-                  ))}
+                <div className="flex gap-3">
+                  <a
+                    href="https://www.linkedin.com/company/rawat-innovations-pvt-ltd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Rawat Innovations on LinkedIn (opens in new tab)"
+                    className="focus:outline-none focus:ring-2 focus:ring-blue-300 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  >
+                    <Image
+                      src="/social-linkedin.png"
+                      alt=""
+                      width={24}
+                      height={24}
+                      className="object-contain brightness-200"
+                      aria-hidden="true"
+                    />
+                  </a>
+                  <a
+                    href="https://x.com/ripl_in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Rawat Innovations on X (opens in new tab)"
+                    className="focus:outline-none focus:ring-2 focus:ring-blue-300 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  >
+                    <Image
+                      src="/social-twitter.png"
+                      alt=""
+                      width={24}
+                      height={24}
+                      className="object-contain brightness-200"
+                      aria-hidden="true"
+                    />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/rawatinnovations"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Rawat Innovations on Instagram (opens in new tab)"
+                    className="focus:outline-none focus:ring-2 focus:ring-blue-300 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  >
+                    <Image
+                      src="/social-instagram.png"
+                      alt=""
+                      width={24}
+                      height={24}
+                      className="object-contain brightness-200"
+                      aria-hidden="true"
+                    />
+                  </a>
                 </div>
               </div>
 
-              {/* Quick Links */}
+              {/* Navigation */}
               <div>
-                <h4 className="text-lg font-bold mb-4">Quick Links</h4>
-                <ul className="space-y-2 text-font-medium">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-300 mb-3">
+                  Navigation
+                </h2>
+                <ul className="space-y-2 list-none">
                   {[
-                    { label: 'About Us', id: 'about' },
+                    { label: 'Products', id: 'products' },
                     { label: 'Services', id: 'services' },
-                    { label: 'Portfolio', id: 'portfolio' },
-                    { label: 'Careers', id: 'careers' },
-                    { label: 'Blog', id: 'blog' },
+                    { label: 'About', id: 'about' },
                     { label: 'Contact', id: 'contact' },
                   ].map((link) => (
                     <li key={link.id}>
                       <button
                         onClick={() => scrollToSection(link.id)}
-                        className="text-blue-100 hover:text-white transition-colors"
+                        className="text-blue-200 hover:text-white transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 rounded min-h-[44px]"
                       >
                         {link.label}
                       </button>
@@ -1295,53 +1170,41 @@ export default function HomePageClient() {
                 </ul>
               </div>
 
-              {/* Legal & Contact */}
+              {/* Legal */}
               <div>
-                <h4 className="text-lg font-bold mb-4">Legal</h4>
-                <ul className="space-y-2 mb-6">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-300 mb-3">
+                  Legal
+                </h2>
+                <ul className="space-y-2 list-none mb-4">
                   <li>
-                    <a
-                      href="#"
-                      className="text-blue-100 hover:text-white transition-colors"
+                    <Link
+                      href="/privacy"
+                      className="text-blue-200 hover:text-white transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 rounded"
                     >
                       Privacy Policy
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
-                      className="text-blue-100 hover:text-white transition-colors"
+                    <Link
+                      href="/terms"
+                      className="text-blue-200 hover:text-white transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 rounded"
                     >
-                      Terms & Conditions
-                    </a>
+                      Terms &amp; Conditions
+                    </Link>
                   </li>
-                  <li className="text-blue-100">CIN: U62011UT2025PTC019256</li>
                 </ul>
-                <div className="text-sm text-blue-200">
-                  <p>
-                    <a
-                      href="mailto:info@rawatinnovations.com"
-                      className="text-blue-200 hover:underline cursor-pointer"
-                    >
-                      info@rawatinnovations.com
-                    </a>
-                  </p>
-                  <p>
-                    <a
-                      href="tel:+9101354093357"
-                      className="text-blue-200 hover:underline cursor-pointer"
-                    >
-                      +91-01354-093357
-                    </a>
-                  </p>
-                </div>
+                <p className="text-blue-300 text-xs">
+                  CIN: U62011UT2025PTC019256
+                </p>
+                <p className="text-blue-300 text-xs mt-1">
+                  Rawat Innovations Pvt. Ltd.
+                </p>
               </div>
             </div>
 
-            <div className="border-t border-blue-800 pt-8 text-center">
-              <p className="text-blue-200">
+            <div className="border-t border-blue-800 pt-6 text-center">
+              <p className="text-blue-300 text-sm">
                 &copy; 2026 Rawat Innovations Pvt. Ltd. All rights reserved.
-                Building the future, one innovation at a time.
               </p>
             </div>
           </div>
