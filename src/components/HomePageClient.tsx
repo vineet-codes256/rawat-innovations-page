@@ -39,7 +39,7 @@ export default function HomePageClient() {
       }
       if (closeMobileMenu) setMobileMenuOpen(false);
     },
-    [],
+    []
   );
 
   // ─── Contact form validation + submit ─────────────────────────────────────
@@ -73,7 +73,7 @@ export default function HomePageClient() {
       await new Promise((r) => setTimeout(r, 400));
       setFormState('success');
     },
-    [],
+    []
   );
 
   // ─── Newsletter validation + submit ───────────────────────────────────────
@@ -88,7 +88,7 @@ export default function HomePageClient() {
       // {{NEEDS_FOUNDER: newsletter endpoint}} — no live endpoint yet
       setNewsletterSuccess(true);
     },
-    [newsletterEmail],
+    [newsletterEmail]
   );
 
   // ─── Nav links ─────────────────────────────────────────────────────────────
@@ -233,7 +233,7 @@ export default function HomePageClient() {
                 id="hero-heading"
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-5 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight"
               >
-                Simple, accessible software — built end to end.
+                Innovating Today for a Smarter Tomorrow
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-3 max-w-2xl mx-auto">
                 Rawat Innovations is a bootstrapped studio in Dehradun,
@@ -335,11 +335,7 @@ export default function HomePageClient() {
                       className="w-24 h-24 bg-purple-100 rounded-2xl flex items-center justify-center"
                       aria-label="CapturePro icon placeholder"
                     >
-                      <span
-                        className="text-4xl"
-                        role="img"
-                        aria-label="Camera"
-                      >
+                      <span className="text-4xl" role="img" aria-label="Camera">
                         📸
                       </span>
                     </div>
@@ -357,9 +353,9 @@ export default function HomePageClient() {
                       CapturePro
                     </h3>
                     <p className="text-gray-700 text-sm leading-relaxed mb-4 flex-1">
-                      A productivity Chrome extension built solo. Reached 34,000+
-                      lifetime installs and 13,438 monthly active users (as of
-                      September 2026) without paid acquisition.
+                      A productivity Chrome extension built solo. Reached
+                      34,000+ lifetime installs and 13,438 monthly active users
+                      (as of September 2026) without paid acquisition.
                     </p>
                     {/* {{NEEDS_FOUNDER: reconfirm current dashboard figures}} */}
                     <div className="flex gap-4 text-center mb-4">
@@ -428,9 +424,9 @@ export default function HomePageClient() {
                     LocalBizLabs
                   </h3>
                   <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                    Web development for local businesses: fast, accessible
-                    sites and small e-commerce builds. Clean code, no
-                    unnecessary plugins, handed over with documentation.
+                    Web development for local businesses: fast, accessible sites
+                    and small e-commerce builds. Clean code, no unnecessary
+                    plugins, handed over with documentation.
                   </p>
                   <button
                     onClick={() => scrollToSection('contact')}
@@ -535,8 +531,8 @@ export default function HomePageClient() {
                     because usable software should be usable by all.
                   </p>
                   <p className="text-gray-700 leading-relaxed">
-                    NearbyConnect is the current primary build. LocalBizLabs
-                    and contract work fund the studio while NearbyConnect moves
+                    NearbyConnect is the current primary build. LocalBizLabs and
+                    contract work fund the studio while NearbyConnect moves
                     through alpha.
                   </p>
 
@@ -577,8 +573,8 @@ export default function HomePageClient() {
                   Get in Touch
                 </h2>
                 <p className="text-gray-600 max-w-xl mx-auto">
-                  For project enquiries, early NearbyConnect access, or
-                  anything else — use the form below or email directly.
+                  For project enquiries, early NearbyConnect access, or anything
+                  else — use the form below or email directly.
                 </p>
               </div>
 
@@ -704,9 +700,7 @@ export default function HomePageClient() {
                             aria-describedby={
                               formErrors.email ? 'f-email-error' : undefined
                             }
-                            aria-invalid={
-                              formErrors.email ? 'true' : undefined
-                            }
+                            aria-invalid={formErrors.email ? 'true' : undefined}
                             className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
                             placeholder="your@email.com"
                             autoComplete="email"
@@ -730,10 +724,7 @@ export default function HomePageClient() {
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
                           Topic{' '}
-                          <span
-                            className="text-red-600"
-                            aria-label="required"
-                          >
+                          <span className="text-red-600" aria-label="required">
                             *
                           </span>
                         </label>
@@ -745,9 +736,7 @@ export default function HomePageClient() {
                           aria-describedby={
                             formErrors.topic ? 'f-topic-error' : undefined
                           }
-                          aria-invalid={
-                            formErrors.topic ? 'true' : undefined
-                          }
+                          aria-invalid={formErrors.topic ? 'true' : undefined}
                           className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] ${formErrors.topic ? 'border-red-500' : 'border-gray-300'}`}
                         >
                           <option value="">Select a topic</option>
@@ -780,10 +769,7 @@ export default function HomePageClient() {
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
                           Message{' '}
-                          <span
-                            className="text-red-600"
-                            aria-label="required"
-                          >
+                          <span className="text-red-600" aria-label="required">
                             *
                           </span>
                         </label>
@@ -796,9 +782,7 @@ export default function HomePageClient() {
                           aria-describedby={
                             formErrors.message ? 'f-message-error' : undefined
                           }
-                          aria-invalid={
-                            formErrors.message ? 'true' : undefined
-                          }
+                          aria-invalid={formErrors.message ? 'true' : undefined}
                           className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical ${formErrors.message ? 'border-red-500' : 'border-gray-300'}`}
                           placeholder="What can we help with?"
                         />
@@ -815,8 +799,8 @@ export default function HomePageClient() {
 
                       {/* Consent */}
                       <p className="text-xs text-gray-500 mb-4">
-                        By sending this message you agree that we may store
-                        your name and email to reply to your enquiry. See our{' '}
+                        By sending this message you agree that we may store your
+                        name and email to reply to your enquiry. See our{' '}
                         <Link
                           href="/privacy"
                           className="text-blue-600 hover:underline"
@@ -1008,10 +992,7 @@ export default function HomePageClient() {
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
                           Email address{' '}
-                          <span
-                            className="text-red-600"
-                            aria-label="required"
-                          >
+                          <span className="text-red-600" aria-label="required">
                             *
                           </span>
                         </label>
@@ -1027,9 +1008,7 @@ export default function HomePageClient() {
                             }
                             aria-invalid={newsletterError ? 'true' : undefined}
                             value={newsletterEmail}
-                            onChange={(e) =>
-                              setNewsletterEmail(e.target.value)
-                            }
+                            onChange={(e) => setNewsletterEmail(e.target.value)}
                             placeholder="your@email.com"
                             className={`flex-1 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] ${newsletterError ? 'border-red-500' : 'border-gray-300'}`}
                             autoComplete="email"
@@ -1070,10 +1049,7 @@ export default function HomePageClient() {
         </main>
 
         {/* ═══ FOOTER ══════════════════════════════════════════════════════════ */}
-        <footer
-          className="bg-blue-900 text-white py-10"
-          role="contentinfo"
-        >
+        <footer className="bg-blue-900 text-white py-10" role="contentinfo">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               {/* Brand */}

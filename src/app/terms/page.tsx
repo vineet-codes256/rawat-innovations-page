@@ -41,9 +41,7 @@ export default function TermsPage() {
         <h1 className="text-3xl font-bold text-blue-900 mb-2">
           Terms &amp; Conditions
         </h1>
-        <p className="text-sm text-gray-500 mb-8">
-          Last updated: October 2026
-        </p>
+        <p className="text-sm text-gray-500 mb-8">Last updated: October 2026</p>
 
         <div className="prose prose-blue max-w-none space-y-8 text-gray-800">
           <section aria-labelledby="acceptance">
@@ -61,8 +59,8 @@ export default function TermsPage() {
               >
                 rawatinnovations.com
               </a>
-              , you agree to be bound by these Terms &amp; Conditions. If you
-              do not agree, please do not use the site.
+              , you agree to be bound by these Terms &amp; Conditions. If you do
+              not agree, please do not use the site.
             </p>
           </section>
 
@@ -95,8 +93,7 @@ export default function TermsPage() {
                 its infrastructure.
               </li>
               <li>
-                Transmit any material that is harmful, offensive, or
-                defamatory.
+                Transmit any material that is harmful, offensive, or defamatory.
               </li>
               <li>
                 Scrape or systematically extract data from the site without our
@@ -131,8 +128,8 @@ export default function TermsPage() {
             <p>
               The site and its content are provided on an &ldquo;as is&rdquo;
               basis without warranties of any kind, whether express or implied.
-              We do not guarantee that the site will be uninterrupted, error-free,
-              or free from viruses.
+              We do not guarantee that the site will be uninterrupted,
+              error-free, or free from viruses.
             </p>
             <p>
               Product descriptions, timelines, and feature information on this
