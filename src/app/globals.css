@@ -89,12 +89,11 @@
     /* Better contrast than default gray-700 */
   }
 
-  /* Ensure minimum touch targets */
+  /* Ensure minimum touch targets for interactive controls */
   button,
   a,
-  input,
-  select,
-  textarea {
+  input:not([type='hidden']),
+  select {
     min-height: 44px;
     min-width: 44px;
   }
@@ -188,8 +187,7 @@
 }
 
 html {
-  /* Enable smooth scrolling on all platforms */
-  scroll-behavior: smooth;
+  /* Smooth scrolling only when the user hasn't requested reduced motion */
   /* Set scroll padding to accommodate fixed header */
   scroll-padding-top: 80px; /* Mobile header height */
   /* Prevent font size adjustments on orientation change - iOS */
@@ -197,6 +195,12 @@ html {
   /* Better text rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @media (min-width: 768px) {

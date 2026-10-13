@@ -15,26 +15,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title:
-    'Rawat Innovations | Software Development, Web Design & NearbyConnect App | India',
+  title: 'Rawat Innovations | Software Studio — Dehradun, India',
   description:
-    'Rawat Innovations is a bootstrapped technology company building NearbyConnect — a hyperlocal social discovery app — alongside software development, web design for local businesses, and game design services. Founded by Vineet Rawat, self-taught full-stack engineer with 4+ years of experience.',
+    'Rawat Innovations Pvt. Ltd. is a bootstrapped software studio in Dehradun, Uttarakhand, India. Building NearbyConnect (hyperlocal social discovery, closed alpha) and CapturePro (Chrome extension, 34,000+ installs). Web development for local businesses via LocalBizLabs.',
   keywords: [
     'software development India',
-    'full stack engineer',
+    'full stack engineer Uttarakhand',
     'web development local business',
     'NearbyConnect',
     'hyperlocal social app',
     'Rawat Innovations',
     'Vineet Rawat',
     'LocalBizLabs',
-    'bootstrapped startup',
-    'Uttarakhand startup',
-    'SaaS development',
-    'AI automation builder',
-    'game development',
+    'bootstrapped startup India',
+    'Dehradun startup',
+    'CapturePro Chrome extension',
     'custom web apps',
-    'tech startup India',
   ],
   authors: [{ name: 'Vineet Rawat', url: 'https://rawatinnovations.com' }],
   creator: 'Vineet Rawat',
@@ -49,10 +45,9 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title:
-      'Rawat Innovations | Software Development, Web Design & NearbyConnect App | India',
+    title: 'Rawat Innovations | Software Studio — Dehradun, India',
     description:
-      'Rawat Innovations is a bootstrapped technology company building NearbyConnect — a hyperlocal social discovery app — alongside software development, web design for local businesses, and game design services. Founded by Vineet Rawat, self-taught full-stack engineer with 4+ years of experience.',
+      'Bootstrapped software studio in Uttarakhand building NearbyConnect and CapturePro. Web development for local businesses via LocalBizLabs. Founded by Vineet Rawat.',
     url: 'https://rawatinnovations.com',
     siteName: 'Rawat Innovations',
     images: [
@@ -60,18 +55,17 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Rawat Innovations - Multi-Sector Technology Solutions',
+        alt: 'Rawat Innovations — Simple, accessible software built end to end.',
       },
     ],
-    locale: 'en_US',
+    locale: 'en_IN',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title:
-      'Rawat Innovations | Software Development, Web Design & NearbyConnect App | India',
+    title: 'Rawat Innovations | Software Studio — Dehradun, India',
     description:
-      'Rawat Innovations is a bootstrapped technology company building NearbyConnect — a hyperlocal social discovery app — alongside software development, web design for local businesses, and game design services. Founded by Vineet Rawat, self-taught full-stack engineer with 4+ years of experience.',
+      'Bootstrapped software studio in Uttarakhand building NearbyConnect and CapturePro. Web development for local businesses via LocalBizLabs.',
     images: ['/og-image.png'],
     creator: '@ripl_in',
     site: '@ripl_in',
@@ -89,31 +83,81 @@ export const metadata: Metadata = {
   },
 };
 
+// Organisation + WebSite JSON-LD
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Rawat Innovations Pvt. Ltd.',
+  alternateName: 'RIPL',
+  url: 'https://rawatinnovations.com',
+  logo: 'https://rawatinnovations.com/logo.png',
+  description:
+    'Bootstrapped software studio in Dehradun, Uttarakhand, India. Building NearbyConnect (hyperlocal social discovery app) and CapturePro (Chrome extension). Web development for local businesses via LocalBizLabs.',
+  foundingDate: '2025',
+  // {{NEEDS_FOUNDER: confirm registered address disclosure}}
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Dehradun',
+    addressRegion: 'Uttarakhand',
+    addressCountry: 'IN',
+  },
+  founder: {
+    '@type': 'Person',
+    name: 'Vineet Rawat',
+    // {{NEEDS_FOUNDER: confirm preferred job title}}
+    jobTitle: 'Founder & CTO',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    availableLanguage: ['English', 'Hindi'],
+    email: 'info@rawatinnovations.com',
+  },
+  sameAs: [
+    'https://www.linkedin.com/company/rawat-innovations-pvt-ltd',
+    'https://x.com/ripl_in',
+    'https://www.instagram.com/rawatinnovations',
+  ],
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Rawat Innovations',
+  url: 'https://rawatinnovations.com',
+  description:
+    'Bootstrapped software studio in Dehradun, Uttarakhand. Building NearbyConnect and providing web development and engineering services.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Rawat Innovations Pvt. Ltd.',
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#3b82f6" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover, user-scalable=yes"
         />
-        {/* iOS specific meta tags */}
+        {/* iOS-specific */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="format-detection" content="telephone=no" />
 
-        {/* Preload critical resources */}
+        {/* Preload critical image */}
         <link rel="preload" href="/logo.png" as="image" />
 
-        {/* Defer service worker registration */}
+        {/* Service worker — deferred to avoid blocking render */}
         <script
           defer
           dangerouslySetInnerHTML={{
@@ -121,8 +165,8 @@ export default function RootLayout({
               if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
                 window.addEventListener('load', function() {
                   setTimeout(function() {
-                    navigator.serviceWorker.register('/sw.js').catch(function(error) {
-                      console.log('Service Worker registration failed:', error);
+                    navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                      console.log('Service Worker registration failed:', err);
                     });
                   }, 2000);
                 });
@@ -130,194 +174,18 @@ export default function RootLayout({
             `,
           }}
         />
-        {/* JSON-LD structured data - defer loading */}
+
+        {/* JSON-LD structured data */}
         <script
           type="application/ld+json"
-          defer
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: 'Rawat Innovations',
-              url: 'https://rawatinnovations.com',
-              description:
-                'Multi-sector technology company specializing in software development, gaming, tourism tech, agritech, and digital services',
-              publisher: {
-                '@type': 'Organization',
-                name: 'Rawat Innovations Pvt. Ltd.',
-              },
-              potentialAction: {
-                '@type': 'SearchAction',
-                target: 'https://rawatinnovations.com/#contact',
-                'query-input': 'required name=search_term_string',
-              },
-            }),
+            __html: JSON.stringify(organizationSchema),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'Rawat Innovations Pvt. Ltd.',
-              url: 'https://rawatinnovations.com',
-              logo: 'https://rawatinnovations.com/logo.png',
-              description:
-                'Emerging multi-sector technology company developing innovative software solutions, gaming experiences, tourism technology, agritech innovations, and digital services.',
-              foundingDate: '2025',
-              founder: {
-                '@type': 'Person',
-                name: 'Vineet Rawat',
-                jobTitle: 'Founder & CTO',
-              },
-              address: {
-                '@type': 'PostalAddress',
-                addressCountry: 'IN',
-                addressRegion: 'Uttarakhand',
-              },
-              contactPoint: {
-                '@type': 'ContactPoint',
-                contactType: 'customer service',
-                availableLanguage: 'English',
-                email: 'info@rawatinnovations.com',
-              },
-              sameAs: [
-                'https://www.linkedin.com/company/rawat-innovations-pvt-ltd',
-                'https://x.com/ripl_in',
-                'https://www.instagram.com/rawatinnovations',
-              ],
-              knowsAbout: [
-                'Software Development',
-                'Game Design',
-                'Tourism Technology',
-                'AgriTech Innovation',
-                'Digital Services',
-                'AI Solutions',
-                'Web Development',
-                'Mobile Applications',
-                'Cloud Computing',
-                'Blockchain Technology',
-                'Startup Funding',
-                'Venture Capital',
-                'Technology Innovation',
-                'Emerging Technologies',
-                'Investor Relations',
-                'Uttarakhand Startup',
-                'Uttarakhand Innovation',
-                'Uttarakhand Technology',
-              ],
-              hasOfferCatalog: {
-                '@type': 'OfferCatalog',
-                name: 'Technology Services',
-                itemListElement: [
-                  {
-                    '@type': 'Offer',
-                    itemOffered: {
-                      '@type': 'Service',
-                      name: 'Software Development',
-                      description:
-                        'Custom software development, web applications, and enterprise solutions',
-                    },
-                  },
-                  {
-                    '@type': 'Offer',
-                    itemOffered: {
-                      '@type': 'Service',
-                      name: 'Game Design & Development',
-                      description:
-                        'Immersive gaming experiences for mobile, desktop, and console platforms',
-                    },
-                  },
-                  {
-                    '@type': 'Offer',
-                    itemOffered: {
-                      '@type': 'Service',
-                      name: 'Tourism Technology',
-                      description:
-                        'Smart travel solutions promoting culture and enhancing accessibility worldwide',
-                    },
-                  },
-                  {
-                    '@type': 'Offer',
-                    itemOffered: {
-                      '@type': 'Service',
-                      name: 'AgriTech Innovation',
-                      description:
-                        'IoT-powered agriculture solutions, AI tools, and rural empowerment initiatives',
-                    },
-                  },
-                  {
-                    '@type': 'Offer',
-                    itemOffered: {
-                      '@type': 'Service',
-                      name: 'Digital Services',
-                      description:
-                        'Branding, consulting, content creation, and comprehensive digital transformation',
-                    },
-                  },
-                ],
-              },
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'FAQPage',
-              mainEntity: [
-                {
-                  '@type': 'Question',
-                  name: 'What services does Rawat Innovations offer?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Rawat Innovations is an emerging technology company with ambitious plans to offer multi-sector technology solutions including software development, game design, tourism technology, agritech innovations, and digital services. We aim to create innovative solutions across diverse industries.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'Who is the founder of Rawat Innovations?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Vineet Rawat is the founder and CTO of Rawat Innovations Pvt. Ltd. He leads all aspects of technology innovation, from software development to business strategy.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'What industries does Rawat Innovations serve?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Rawat Innovations serves six dynamic sectors: Software Development, Game Design, Tourism Technology, Digital Services, Fashion & Apparel, and AgriTech Innovation.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'Is Rawat Innovations seeking investment?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Yes, as an emerging technology startup founded in 2025, Rawat Innovations is actively seeking investors, venture capital, and funding opportunities to accelerate the development of our innovative multi-sector technology solutions.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'Where is Rawat Innovations based?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Rawat Innovations is based in Uttarakhand, India, and is proud to be part of the emerging startup ecosystem in the region while serving clients globally.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'How can I contact Rawat Innovations?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'You can contact Rawat Innovations through our website contact form, email us at info@rawatinnovations.com, or connect with us on LinkedIn, Twitter, and Instagram.',
-                  },
-                },
-              ],
-            }),
+            __html: JSON.stringify(websiteSchema),
           }}
         />
       </head>
