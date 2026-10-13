@@ -41,9 +41,7 @@ export default function PrivacyPage() {
         <h1 className="text-3xl font-bold text-blue-900 mb-2">
           Privacy Policy
         </h1>
-        <p className="text-sm text-gray-500 mb-8">
-          Last updated: October 2026
-        </p>
+        <p className="text-sm text-gray-500 mb-8">Last updated: October 2026</p>
 
         <div className="prose prose-blue max-w-none space-y-8 text-gray-800">
           <section aria-labelledby="who-we-are">
@@ -88,9 +86,9 @@ export default function PrivacyPage() {
                 <strong>Newsletter (if active):</strong> email address only.
               </li>
               <li>
-                <strong>Analytics:</strong> anonymised page-view data via
-                Vercel Analytics. No cookies are set for analytics. No
-                individual visitors are identified.
+                <strong>Analytics:</strong> anonymised page-view data via Vercel
+                Analytics. No cookies are set for analytics. No individual
+                visitors are identified.
               </li>
             </ul>
             <p>We do not collect payment information directly on this site.</p>
@@ -109,7 +107,9 @@ export default function PrivacyPage() {
                 To send you the newsletter, if you subscribed (you may
                 unsubscribe at any time).
               </li>
-              <li>To improve the site using aggregated, anonymous analytics.</li>
+              <li>
+                To improve the site using aggregated, anonymous analytics.
+              </li>
             </ul>
             <p>We do not sell your data to third parties.</p>
           </section>
@@ -166,10 +166,7 @@ export default function PrivacyPage() {
           </section>
 
           <section aria-labelledby="security">
-            <h2
-              id="security"
-              className="text-xl font-bold text-blue-900 mb-3"
-            >
+            <h2 id="security" className="text-xl font-bold text-blue-900 mb-3">
               7. Security
             </h2>
             <p>
@@ -181,10 +178,7 @@ export default function PrivacyPage() {
           </section>
 
           <section aria-labelledby="changes">
-            <h2
-              id="changes"
-              className="text-xl font-bold text-blue-900 mb-3"
-            >
+            <h2 id="changes" className="text-xl font-bold text-blue-900 mb-3">
               8. Changes to this policy
             </h2>
             <p>
